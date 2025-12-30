@@ -227,6 +227,9 @@ Alerts are configured using **Datadog**.
 python -m venv venv
 source venv/bin/activate
 
+# Upgrade pip
+python.exe -m pip install --upgrade pip
+
 # Install dependencies
 pip install -r requirements.txt
 ```
