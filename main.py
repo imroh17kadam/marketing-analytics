@@ -2,11 +2,13 @@ from pipelines.train_pipeline import TrainPipeline
 from pipelines.simulate_pipeline import SimulationPipeline
 from pipelines.forecast_pipeline import ForecastPipeline
 
-from src.data.data_loader import DataLoader
-from src.utils.logger import get_logger
+from src.ingestion.ingestion import DataIngestion
+from src.models.forecasting import DemandForecaster
+from src.utils.logger import logger
 
-logger = get_logger("MAIN")
+from pathlib import Path 
 
+logger = logger("MAIN")
 
 def main():
     logger.info("MMM system started")
@@ -14,7 +16,8 @@ def main():
     # -------------------------
     # Common configuration
     # -------------------------
-    DATA_PATH = "data/processed/marketing_data.csv"
+    BASE_DIR = Path(__file__).resolve().parent
+    DATA_PATH = BASE_DIR / "data" / "raw" / "synthetic_mmm_data.csv"
 
     channel_params = {
         "tv_spend": {"decay": 0.6, "gamma": 0.5},
@@ -56,7 +59,7 @@ def main():
     # -------------------------
     # Load data once
     # -------------------------
-    df = DataLoader(DATA_PATH).load()
+    df = DataIngestion(DATA_PATH, "csv").load()
 
     # -------------------------
     # STEP 2 — SIMULATION
@@ -67,26 +70,38 @@ def main():
     }
 
     simulator = SimulationPipeline(
-        df=df,
+        df=df.copy(),
         channel_params=channel_params,
         features_mmm=features_mmm,
     )
 
     scenario_results = simulator.run(scenarios)
     logger.info("Scenario simulation completed")
-    print(scenario_results)
+    logger.info(scenario_results)
 
     # -------------------------
     # STEP 3 — FORECAST
     # -------------------------
+    df_mmm = df.copy()
+
     forecaster = ForecastPipeline(
         channel_params=channel_params,
         baseline_features=baseline_features,
         features_mmm=features_mmm,
     )
 
-    future_df = ...  # (your future data generator)
-    forecast = forecaster.run(df, future_df)
+    demand_forecaster = DemandForecaster(baseline_features=baseline_features, channel_params=channel_params)
+
+    # Prepare future data (next 12 weeks) with optimized spend
+    optimized_spend = {
+        "social_spend": df_mmm["social_spend"].mean() * 1.3,
+        "search_spend": df_mmm["search_spend"].mean() * 1.2,
+        "tv_spend": df_mmm["tv_spend"].mean() * 0.8,
+        "digital_spend": df_mmm["digital_spend"].mean() * 0.7
+    }
+
+    future_df = demand_forecaster.prepare_future_data(df_mmm, future_weeks=12, optimized_spend=optimized_spend)
+    forecast = forecaster.run(df_mmm, future_df)
 
     logger.info("Forecasting completed")
     print(forecast)

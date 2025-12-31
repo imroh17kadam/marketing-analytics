@@ -1,6 +1,7 @@
 import pandas as pd
 from src.features.adstock import adstock_geometric
 from src.features.saturation import hill_saturation
+from src.utils.logger import logger
 
 
 class ScenarioSimulator:
@@ -76,6 +77,8 @@ class ScenarioSimulator:
         for name, changes in scenarios.items():
             simulated_sales = self.simulate_budget_change(changes)
             lift = simulated_sales - self.baseline_sales
+
+            print('simulated: ', simulated_sales)
             data.append({"Scenario": name, "Total Sales": simulated_sales, "Sales Lift": lift})
 
         return pd.DataFrame(data).sort_values(by="Sales Lift", ascending=False)

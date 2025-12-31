@@ -3,7 +3,7 @@ import pandas as pd
 
 from src.features.feature_builder import MediaFeatureBuilder
 from src.simulation.scenarios import ScenarioSimulator
-from src.utils.logger import get_logger
+from src.utils.logger import logger
 
 
 class SimulationPipeline:
@@ -23,9 +23,9 @@ class SimulationPipeline:
         self.features_mmm = features_mmm
         self.model_path = model_path
 
-        self.logger = get_logger(self.__class__.__name__)
+        self.logger = logger(self.__class__.__name__)
 
-    def run(self, scenarios: list) -> pd.DataFrame:
+    def run(self, scenarios: dict) -> pd.DataFrame:
         self.logger.info("Simulation pipeline started")
 
         # Load model
@@ -39,21 +39,25 @@ class SimulationPipeline:
 
         results = []
 
-        for scenario in scenarios:
-            simulator = ScenarioSimulator(
-                model=model,
-                df=df_mmm,
-                channels=self.channel_params,
-                features=self.features_mmm,
-            )
+        simulator = ScenarioSimulator(
+            model=model,
+            df=df_mmm,
+            channel_params=self.channel_params,
+            features=self.features_mmm,
+        )
 
-            scenario_df = simulator.compare_scenarios(scenarios)
-            print(scenario_df)
+        for scenario_name, changes in scenarios.items():
+            scenario_dict = {scenario_name: changes}
+            scenario_df = simulator.compare_scenarios(scenario_dict)
 
-            results.append({
-                "scenario": scenario["name"],
-                "sales_lift": scenario_df - baseline_sales
-            })
+            self.logger.info(f"scenario_dict: {scenario_dict}")
+            self.logger.info(f"scenario_df: {scenario_df}")
+
+            for _, row in scenario_df.iterrows():
+                results.append({
+                    "scenario": row["Scenario"],
+                    "sales_lift": row["Sales Lift"]
+                })
 
         result_df = pd.DataFrame(results).sort_values(
             by="sales_lift", ascending=False

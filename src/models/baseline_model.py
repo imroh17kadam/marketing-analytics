@@ -1,56 +1,64 @@
 import pandas as pd
-import numpy as np
 from sklearn.linear_model import LinearRegression
-from src.evaluation.metrics import RegressionMetrics
 from sklearn.model_selection import train_test_split
+from src.evaluation.metrics import RegressionMetrics
 
 
 class BaselineMMM:
     """
-    Baseline Marketing Mix Model using Linear Regression
+    Baseline (Naive) Marketing Mix Model using Linear Regression.
+
+    NOTE:
+    - Media variables are treated as linear
+    - No adstock or saturation is applied
+    - Intended only as a benchmark model
     """
 
-    def __init__(self, test_size=0.2, shuffle=False, random_state=None):
-        self.model = LinearRegression()
+    def __init__(self, test_size: float = 0.2):
         self.test_size = test_size
-        self.shuffle = shuffle
-        self.random_state = random_state
+        self.model = LinearRegression()
         self.coef_df = None
+
+        # Stored after fit
+        self.X_train = None
+        self.X_test = None
+        self.y_train = None
+        self.y_test = None
 
     def split_data(self, X: pd.DataFrame, y: pd.Series):
         """
-        Chronological train/test split
+        Chronological train-test split (no shuffling for time series data)
         """
         return train_test_split(
-            X, y,
+            X,
+            y,
             test_size=self.test_size,
-            shuffle=self.shuffle,
-            random_state=self.random_state
+            shuffle=False
         )
 
     def fit(self, X: pd.DataFrame, y: pd.Series):
         """
-        Train Linear Regression model
+        Fit the baseline linear MMM
         """
-        X_train, X_test, y_train, y_test = self.split_data(X, y)
-        self.X_train = X_train
-        self.X_test = X_test
-        self.y_train = y_train
-        self.y_test = y_test
+        self.X_train, self.X_test, self.y_train, self.y_test = self.split_data(X, y)
 
-        self.model.fit(X_train, y_train)
+        self.model.fit(self.X_train, self.y_train)
 
-        # Save coefficients
-        self.coef_df = pd.DataFrame({
-            "feature": X.columns,
-            "coefficient": self.model.coef_
-        }).sort_values(by="coefficient", ascending=False)
+        # Store coefficients
+        self.coef_df = (
+            pd.DataFrame({
+                "feature": X.columns,
+                "coefficient": self.model.coef_
+            })
+            .sort_values(by="coefficient", ascending=False)
+            .reset_index(drop=True)
+        )
 
         return self
 
-    def predict(self, X: pd.DataFrame):
+    def predict(self, X: pd.DataFrame) -> pd.Series:
         """
-        Predict using the trained model
+        Predict sales using trained model
         """
         return pd.Series(
             self.model.predict(X),
@@ -60,19 +68,21 @@ class BaselineMMM:
 
     def evaluate(self, X: pd.DataFrame = None, y: pd.Series = None):
         """
-        Evaluate model using RMSE and R²
-        If X and y are None, evaluate on test set
+        Evaluate model using RMSE and R².
+        Defaults to test set if X and y are not provided.
         """
         if X is None or y is None:
             X = self.X_test
             y = self.y_test
 
         y_pred = self.predict(X)
-        metrics = RegressionMetrics.evaluate(y, y_pred)
-        return metrics
+        return RegressionMetrics.evaluate(y, y_pred)
 
-    def get_coefficients(self):
+    def get_coefficients(self) -> pd.DataFrame:
         """
-        Return feature coefficients
+        Return model coefficients
         """
+        if self.coef_df is None:
+            raise ValueError("Model must be fitted before accessing coefficients.")
+
         return self.coef_df

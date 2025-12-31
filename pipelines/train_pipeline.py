@@ -1,13 +1,14 @@
 import pandas as pd
 import joblib
+from pathlib import Path
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import Ridge
 
-from src.data.data_loader import DataLoader
+from src.ingestion.ingestion import DataIngestion
 from src.features.feature_builder import MediaFeatureBuilder
 from src.evaluation.metrics import RegressionMetrics
-from src.utils.logger import get_logger
+from src.utils.logger import logger
 
 
 class TrainPipeline:
@@ -31,13 +32,13 @@ class TrainPipeline:
         self.alpha = alpha
         self.test_size = test_size
 
-        self.logger = get_logger(self.__class__.__name__)
+        self.logger = logger(self.__class__.__name__)
 
     def run(self):
         self.logger.info("Training pipeline started")
 
         # Load data
-        df = DataLoader(self.data_path).load()
+        df = DataIngestion(self.data_path, "csv").load()
 
         # Feature engineering
         builder = MediaFeatureBuilder(self.channel_params)
@@ -60,6 +61,12 @@ class TrainPipeline:
         metrics = RegressionMetrics.evaluate(y_test, y_pred)
 
         self.logger.info(f"Model evaluation: {metrics}")
+
+        ARTIFACTS_DIR = Path("artifacts")
+        ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+
+        model_path = ARTIFACTS_DIR / "ridge_mmm_model.pkl"
+        joblib.dump(model, model_path)
 
         # Save artifacts
         joblib.dump(model, "artifacts/ridge_mmm_model.pkl")

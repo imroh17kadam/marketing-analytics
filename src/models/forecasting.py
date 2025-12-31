@@ -50,16 +50,18 @@ class DemandForecaster:
         """
         Generate future dataframe with dates, baseline features, and optimized spend
         """
+        df["date"] = pd.to_datetime(df["date"], dayfirst=True)
+
         last_date = df["date"].max()
-        future_dates = pd.date_range(
+        future_df = pd.date_range(
             start=last_date + pd.Timedelta(weeks=1),
             periods=future_weeks,
             freq="W"
         )
 
         future_df = pd.DataFrame({
-            "date": future_dates,
-            "weekofyear": future_dates.isocalendar().week.astype(int),
+            "date": future_df,
+            "weekofyear": future_df.isocalendar().week.astype(int),
             "price_index": 1.0,
             "promo_flag": [0] * future_weeks,
             "holiday_flag": [0] * future_weeks
