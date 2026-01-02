@@ -1,7 +1,8 @@
 import pandas as pd
 from src.features.adstock import adstock_geometric
 from src.features.saturation import hill_saturation
-from src.utils.logger import logger
+from src.utils.logger import get_logger
+
 
 
 class ScenarioSimulator:
@@ -26,6 +27,8 @@ class ScenarioSimulator:
         self.channel_params = channel_params
         self.features = features
         self.baseline_sales = self.model.predict(self.df[self.features]).sum()
+        
+        self.logger = get_logger(self.__class__.__name__)
 
     def simulate_budget_change(self, channel_changes: dict) -> float:
         """

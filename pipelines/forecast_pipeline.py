@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 
 from src.features.adstock import adstock_geometric
 from src.features.saturation import hill_saturation
-from src.utils.logger import logger
+from src.utils.logger import get_logger
 
 
 class ForecastPipeline:
@@ -26,7 +26,7 @@ class ForecastPipeline:
         self.features_mmm = features_mmm
         self.model_path = model_path
 
-        self.logger = logger(self.__class__.__name__)
+        self.logger = get_logger(self.__class__.__name__)
 
     def run(
         self,
@@ -38,7 +38,7 @@ class ForecastPipeline:
         # Load MMM model
         mmm_model = joblib.load(self.model_path)
 
-        historical_df["date"] = pd.to_datetime(historical_df["date"], dayfirst=True)
+        historical_df["date"] = pd.to_datetime(historical_df["date"], dayfirst=False, errors="raise")
         historical_df["weekofyear"] = historical_df["date"].dt.isocalendar().week
 
         # Train baseline demand model

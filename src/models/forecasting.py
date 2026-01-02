@@ -50,7 +50,7 @@ class DemandForecaster:
         """
         Generate future dataframe with dates, baseline features, and optimized spend
         """
-        df["date"] = pd.to_datetime(df["date"], dayfirst=True)
+        df["date"] = pd.to_datetime(df["date"], dayfirst=False, errors="raise")
 
         last_date = df["date"].max()
         future_df = pd.date_range(

@@ -4,11 +4,11 @@ from pipelines.forecast_pipeline import ForecastPipeline
 
 from src.ingestion.ingestion import DataIngestion
 from src.models.forecasting import DemandForecaster
-from src.utils.logger import logger
+from src.utils.logger import get_logger
 
 from pathlib import Path 
 
-logger = logger("MAIN")
+logger = get_logger(__name__)
 
 def main():
     logger.info("MMM system started")
@@ -17,7 +17,7 @@ def main():
     # Common configuration
     # -------------------------
     BASE_DIR = Path(__file__).resolve().parent
-    DATA_PATH = BASE_DIR / "data" / "raw" / "synthetic_mmm_data.csv"
+    DATA_PATH = BASE_DIR / "data" / "processed" / "processed_mmm.csv"
 
     channel_params = {
         "tv_spend": {"decay": 0.6, "gamma": 0.5},

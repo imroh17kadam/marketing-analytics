@@ -1,7 +1,6 @@
 import pandas as pd
 from typing import Optional
-
-from src.utils.logger import logger
+from src.utils.logger import get_logger
 
 
 class DataIngestion:
@@ -30,7 +29,7 @@ class DataIngestion:
         """
         self.file_path = file_path
         self.file_type = file_type
-        self.logger = logger(self.__class__.__name__)
+        self.logger = get_logger(self.__class__.__name__)
 
     def load(self) -> pd.DataFrame:
         """Load data from disk"""

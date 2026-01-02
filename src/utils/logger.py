@@ -2,7 +2,7 @@ import logging
 import sys
 
 
-def logger(name: str, level=logging.INFO):
+def get_logger(name: str, level=logging.INFO):
     """
     Returns a configured logger
     """

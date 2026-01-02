@@ -3,7 +3,7 @@ import pandas as pd
 
 from src.features.feature_builder import MediaFeatureBuilder
 from src.simulation.scenarios import ScenarioSimulator
-from src.utils.logger import logger
+from src.utils.logger import get_logger
 
 
 class SimulationPipeline:
@@ -23,7 +23,7 @@ class SimulationPipeline:
         self.features_mmm = features_mmm
         self.model_path = model_path
 
-        self.logger = logger(self.__class__.__name__)
+        self.logger = get_logger(self.__class__.__name__)
 
     def run(self, scenarios: dict) -> pd.DataFrame:
         self.logger.info("Simulation pipeline started")

@@ -8,7 +8,7 @@ from sklearn.linear_model import Ridge
 from src.ingestion.ingestion import DataIngestion
 from src.features.feature_builder import MediaFeatureBuilder
 from src.evaluation.metrics import RegressionMetrics
-from src.utils.logger import logger
+from src.utils.logger import get_logger
 
 
 class TrainPipeline:
@@ -31,8 +31,7 @@ class TrainPipeline:
         self.target = target
         self.alpha = alpha
         self.test_size = test_size
-
-        self.logger = logger(self.__class__.__name__)
+        self.logger = get_logger(self.__class__.__name__)
 
     def run(self):
         self.logger.info("Training pipeline started")
