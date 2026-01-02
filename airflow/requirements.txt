@@ -1,0 +1,6 @@
+python-dateutil>=2.8.2
+pandas>=2.0.0
+numpy>=1.24.0
+apache-airflow
+pyyaml>=6.0
+loguru>=0.7.2
