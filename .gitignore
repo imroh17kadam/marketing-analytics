@@ -211,3 +211,11 @@ data/
 
 # Artifacts
 artifacts/
+
+# Airflow runtime files
+airflow-webserver.pid
+logs/
+scheduler/
+__pycache__/
+*.pyc
+.venv/
