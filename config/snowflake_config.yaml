@@ -1,0 +1,9 @@
+snowflake:
+  account: ${SNOWFLAKE_ACCOUNT}
+  user: ${SNOWFLAKE_USER}
+  password: ${SNOWFLAKE_PASSWORD}
+
+  role: ML_SERVICE_ROLE
+  warehouse: ML_WH
+  database: MARKETING_ML
+  schema: ANALYTICS

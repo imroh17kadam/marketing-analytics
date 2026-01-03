@@ -3,3 +3,6 @@ pandas
 matplotlib
 seaborn
 scikit-learn
+snowflake-connector-python
+snowflake-sqlalchemy
+python-dotenv
