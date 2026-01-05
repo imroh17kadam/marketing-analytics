@@ -7,6 +7,10 @@ from datetime import datetime, timedelta
 
 from src.ingestion.extract import extract_data
 from src.preprocess.transform import transform_data
+
+from src.ingestion.extract import extract_data
+from src.preprocess.load_raw_to_snowflake import load_raw_to_snowflake
+from src.preprocess.transform import transform_data
 from src.preprocess.load import load_data
 
 default_args = {
@@ -16,43 +20,35 @@ default_args = {
 }
 
 RAW_PATH = "data/raw/synthetic_mmm_data.csv"
-PROCESSED_PATH = "data/processed/processed_mmm.csv"
 
-def extract(**context):
-    df = extract_data(RAW_PATH)
-    context["ti"].xcom_push(key="raw_df", value=df)
+def extract_and_load_raw():
+    df_raw = extract_data(RAW_PATH)
+    load_raw_to_snowflake(df_raw, source="synthetic_csv")
 
-def transform(**context):
-    df = context["ti"].xcom_pull(key="raw_df")
-    df_clean = transform_data(df)
-    context["ti"].xcom_push(key="clean_df", value=df_clean)
-
-def load(**context):
-    df = context["ti"].xcom_pull(key="clean_df")
-    load_data(df, PROCESSED_PATH)
+def transform_and_load_processed():
+    # For now transform uses the extracted dataframe logic
+    # In STEP 6 we will read directly from Snowflake
+    df_raw = extract_data(RAW_PATH)
+    df_processed = transform_data(df_raw)
+    load_data(df_processed)
 
 with DAG(
-    dag_id="marketing_sales_etl_v1",
+    dag_id="marketing_sales_etl_v2",
     start_date=datetime(2025, 1, 1),
     schedule_interval="@daily",
     catchup=False,
     default_args=default_args,
-    tags=["etl", "marketing"],
+    tags=["etl", "marketing", "snowflake"],
 ) as dag:
 
-    extract_task = PythonOperator(
-        task_id="extract_data",
-        python_callable=extract,
+    load_raw_task = PythonOperator(
+        task_id="extract_and_load_raw",
+        python_callable=extract_and_load_raw,
     )
 
-    transform_task = PythonOperator(
-        task_id="transform_data",
-        python_callable=transform,
+    load_processed_task = PythonOperator(
+        task_id="transform_and_load_processed",
+        python_callable=transform_and_load_processed,
     )
 
-    load_task = PythonOperator(
-        task_id="load_data",
-        python_callable=load,
-    )
-
-    extract_task >> transform_task >> load_task
+    load_raw_task >> load_processed_task
