@@ -17,7 +17,11 @@ def main():
     # Common configuration
     # -------------------------
     BASE_DIR = Path(__file__).resolve().parent
-    DATA_PATH = BASE_DIR / "data" / "processed" / "processed_mmm.csv"
+    # DATA_PATH = BASE_DIR / "data" / "processed" / "processed_mmm.csv"
+    QUERY = """
+            SELECT *
+            FROM MARKETING_ML.ANALYTICS.PROCESSED_MARKETING_DATA
+            """
 
     channel_params = {
         "tv_spend": {"decay": 0.6, "gamma": 0.5},
@@ -47,7 +51,7 @@ def main():
     # STEP 1 — TRAIN
     # -------------------------
     trainer = TrainPipeline(
-        data_path=DATA_PATH,
+        query=QUERY,
         channel_params=channel_params,
         features_mmm=features_mmm,
         alpha=1.0,
@@ -59,7 +63,14 @@ def main():
     # -------------------------
     # Load data once
     # -------------------------
-    df = DataIngestion(DATA_PATH, "csv").load()
+    # df = DataIngestion(DATA_PATH, "csv").load()
+    df = DataIngestion(
+        source="snowflake",
+        query="""
+            SELECT *
+            FROM MARKETING_ML.ANALYTICS.PROCESSED_MARKETING_DATA
+            """
+        ).load()
 
     # -------------------------
     # STEP 2 — SIMULATION

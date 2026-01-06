@@ -1,8 +1,6 @@
 import pandas as pd
 from src.utils.logger import get_logger
 
-from datetime import datetime
-from src.common.snowflake_client import SnowflakeClient
 
 logger = get_logger(__name__)
 

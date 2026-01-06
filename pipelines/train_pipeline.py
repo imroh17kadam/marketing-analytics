@@ -10,6 +10,10 @@ from src.features.feature_builder import MediaFeatureBuilder
 from src.evaluation.metrics import RegressionMetrics
 from src.utils.logger import get_logger
 
+from datetime import datetime
+import uuid
+
+from src.common.snowflake_client import SnowflakeClient
 
 class TrainPipeline:
     """
@@ -18,14 +22,16 @@ class TrainPipeline:
 
     def __init__(
         self,
-        data_path: str,
+        query: str,
+        # data_path: str,
         channel_params: dict,
         features_mmm: list,
         target: str = "sales",
         alpha: float = 1.0,
         test_size: float = 0.2
     ):
-        self.data_path = data_path
+        self.query = query
+        # self.data_path = data_path
         self.channel_params = channel_params
         self.features_mmm = features_mmm
         self.target = target
@@ -37,7 +43,7 @@ class TrainPipeline:
         self.logger.info("Training pipeline started")
 
         # Load data
-        df = DataIngestion(self.data_path, "csv").load()
+        df = DataIngestion(source="snowflake", query=self.query).load()
 
         # Feature engineering
         builder = MediaFeatureBuilder(self.channel_params)
@@ -75,8 +81,44 @@ class TrainPipeline:
             "coefficient": model.coef_
         }).sort_values(by="coefficient", ascending=False)
 
-        coef_df.to_csv("artifacts/mmm_coefficients.csv", index=False)
+        coef_df["model_name"] = "ridge_mmm_v1"
+        coef_df["run_id"] = str(uuid.uuid4())
+        coef_df["created_at"] = datetime.utcnow()
 
+        # Reorder columns to match Snowflake table
+        coef_df = coef_df[
+            ["model_name", "feature", "coefficient", "run_id", "created_at"]
+        ]
+
+        # Write to Snowflake
+        sf = SnowflakeClient()
+
+        query = """
+            INSERT INTO MMM_COEFFICIENTS (
+                model_name,
+                feature,
+                coefficient,
+                run_id,
+                created_at
+            )
+            VALUES (%s, %s, %s, %s, %s)
+        """
+
+        for _, row in coef_df.iterrows():
+            params = (
+                row["model_name"],
+                row["feature"],
+                float(row["coefficient"]),     # ensure numpy → float
+                row["run_id"],
+                row["created_at"].isoformat()  # datetime → string
+            )
+
+            sf.execute(query, params)
+
+        sf.close()
+
+        self.logger.info("Stored MMM Coefficients to Snwoflake table 'MMM_COEFFICIENTS'")
+        
         self.logger.info("Training pipeline completed")
 
         return model, metrics
