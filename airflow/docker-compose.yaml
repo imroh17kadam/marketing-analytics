@@ -9,10 +9,12 @@ services:
       - postgres-db-volume:/var/lib/postgresql/data
 
   airflow-init:
-    image: apache/airflow:2.8.1
+    build:
+      context: .
     depends_on:
       - postgres
     environment:
+      AIRFLOW_HOME: /opt/airflow
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
     volumes:
@@ -28,11 +30,13 @@ services:
       bash -c "airflow db migrate && airflow users create --username admin --firstname Air --lastname Flow --role Admin --email admin@example.com --password admin"
 
   airflow-webserver:
-    image: apache/airflow:2.8.1
+    build:
+      context: .
     depends_on:
       - postgres
       - airflow-init
     environment:
+      AIRFLOW_HOME: /opt/airflow
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
@@ -51,11 +55,13 @@ services:
       - ../.env
 
   airflow-scheduler:
-    image: apache/airflow:2.8.1
+    build:
+      context: .
     depends_on:
       - postgres
       - airflow-init
     environment:
+      AIRFLOW_HOME: /opt/airflow
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       PYTHONPATH: /opt/airflow
