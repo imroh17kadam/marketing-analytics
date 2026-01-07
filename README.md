@@ -84,87 +84,107 @@ Business Insights (MMM / Meridian)
 ## 📁 Project Structure
 
 ```
-mlops-marketing-platform/
+marketing-analytics/
 │
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
 │
+├── airflow/
+│ ├── dags/
+│ │ └── etl_pipeline.py
+| ├── logs/
+| ├── docker-compose.yaml
+| ├── Dockerfile
+| ├── requirements.txt
+│ └── plugins/
+│
+├── artifacts/
+│ └── ridge_model_mmm.pkl
+│
 ├── config/
 │ ├── dev.yaml
 │ ├── prod.yaml
-│ └── snowflake.yaml
+│ └── snowflake_config.yaml
 │
 ├── data/
 │ ├── raw/
 │ ├── processed/
 │ └── sample/
+|
+├── kubeflow/
+| └── components/
+│   ├── load_data/
+│   │   ├── component.py
+│   │   └── Dockerfile
+│   ├── train_mmm/
+│   │   ├── component.py
+│   │   └── Dockerfile
+│   ├── evaluate_model/
+│   │   ├── component.py
+│   │   └── Dockerfile
+│   └── save_artifacts/
+│       ├── component.py
+│       └── Dockerfile
 │
-├── airflow/
-│ ├── dags/
-│ │ ├── etl_pipeline.py
-│ │ ├── feature_pipeline.py
-│ │ └── retraining_trigger.py
-│ └── plugins/
+├── pipelines/
+│ └── mmm_training_pipeline.py
+│
+└── requirements.txt
+│
+├── notebooks/
+│ └── test.ipynb
+│
+├── pipelines/
+│ ├── forecast_pipeline.py
+│ ├── simulate_pipeline.py
+│ └── train_pipeline.py
 │
 ├── src/
-│ ├── ingestion/
-│ │ └── ingest_data.py
-│ │
-│ ├── preprocessing/
-│ │ └── clean_data.py
-│ │
-│ ├── features/
-│ │ └── feature_engineering.py
-│ │
-│ ├── models/
-│ │ ├── forecasting/
-│ │ │ ├── train.py
-│ │ │ └── predict.py
-│ │ │
-│ │ └── mmm/
-│ │ ├── train_meridian.py
-│ │ └── simulate.py
+│ ├── common/
+│ │ └── snowflake_client.py
 │ │
 │ ├── evaluation/
+│ │ ├── roi.py
 │ │ └── metrics.py
 │ │
+│ ├── features/
+│ │ ├── adstock.py
+│ │ ├── feature_builder.py
+│ │ └── saturation.py
+| |
+│ ├── ingestion/
+│ │ ├── generator.py
+│ │ ├── ingestion.py
+│ │ └── extract.py
+│ │
+│ ├── models/
+│ │ ├── baseline_model.py
+│ │ ├── forecasting.py
+│ │ └── mmm_model.py
+│ │
+│ ├── preprocess/
+│ │ ├── load_raw_to_snowflake.py
+│ │ ├── load.py
+| | ├── preprocess.py
+│ │ └── transform.py
+│ │
+│ ├── simulation/
+│ │ ├── optimizer.py
+│ │ └── scenarios.py
+│ │
 │ └── utils/
-│ ├── logger.py
-│ ├── config_loader.py
-│ └── db.py
+│  ├── logger.py
+│  └── config_loader.py
 │
-├── kubeflow/
-│ ├── pipelines/
-│ │ └── training_pipeline.py
-│ └── components/
-│
-├── docker/
-│ ├── training.Dockerfile
-│ ├── inference.Dockerfile
-│ └── airflow.Dockerfile
-│
-├── inference/
-│ ├── app.py
-│ ├── schemas.py
-│ └── requirements.txt
-│
-├── k8s/
-│ ├── airflow/
-│ ├── kubeflow/
-│ ├── inference/
-│ └── configmaps/
-│
-├── monitoring/
-│ ├── datadog.yaml
-│ └── alerts.md
-│
-├── ci_cd/
-│ └── github_actions.yaml
-│
-└── tests/
-├── unit/
-└── integration/
+├── venv/
+├── .env
+├── airflow-webserver.pid
+├── airflow.cfg
+├── LICENSE
+├── main.py
+├── test_snowflake_connection.py
+└── webserver_config.py 
 ```
 
 ---
