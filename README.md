@@ -127,7 +127,7 @@ marketing-analytics/
 │       ├── component.py
 │       └── Dockerfile
 │
-├── pipelines/
+├── kubeflow_pipelines/
 │ └── mmm_training_pipeline.py
 │
 └── requirements.txt
