@@ -219,3 +219,6 @@ scheduler/
 __pycache__/
 *.pyc
 .venv/
+
+# Kubeflow files
+*.yaml

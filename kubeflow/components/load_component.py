@@ -2,13 +2,13 @@ from kfp.dsl import component, Output, Dataset
 from pathlib import Path
 
 
-# @component(
-#     base_image="python:3.10",
-#     packages_to_install=["pandas", "snowflake-connector-python"]
-# )
+@component(
+    base_image="python:3.10",
+    packages_to_install=["pandas", "snowflake-connector-python"]
+)
 def ingest_training_data(
     query: str,
-    output_path: str | Path
+    output_path: Output[Dataset]
 ):
     """
     Ingest marketing data from Snowflake and output as a dataset artifact.
@@ -16,8 +16,8 @@ def ingest_training_data(
     import pandas as pd
     from src.ingestion.ingestion import DataIngestion
 
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    # output_path = Path(output_path)
+    # output_path.parent.mkdir(parents=True, exist_ok=True)
 
     ingestion = DataIngestion(
         source="snowflake",
@@ -25,6 +25,6 @@ def ingest_training_data(
     )
 
     df: pd.DataFrame = ingestion.load()
-    df.to_csv(output_path, index=False)
+    df.to_csv(output_path.path, index=False)
 
-    print(f"✅ Data saved to {output_path}")
+    print(f"✅ Data saved to {output_path.path}")

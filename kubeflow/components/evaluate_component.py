@@ -1,12 +1,12 @@
-from kfp.dsl import component, Input, Dataset, Model
+from kfp.dsl import component, Input, Output, Dataset, Model
 from pathlib import Path
 import json
 
-# @component(base_image="python:3.10")
+@component(base_image="python:3.10")
 def evaluate_model(
-    input_path: str | Path,
-    model_artifact: str | Path,
-    evaluation_path: str | Path
+    test_path: Input[Dataset],
+    model_artifact: Input[Model],
+    evaluation_path: Output[Dataset]
 ):
     """
     Store MMM coefficients into Snowflake.
@@ -18,26 +18,20 @@ def evaluate_model(
     from src.common.snowflake_client import SnowflakeClient
     from src.evaluation.metrics import RegressionMetrics
 
-    input_path = Path(input_path)
-    model_artifact = Path(model_artifact)
-    evaluation_path = Path(evaluation_path)
 
-    evaluation_path.mkdir(parents=True, exist_ok=True)
-
-    model = joblib.load(model_artifact)
-    X_test = pd.read_csv(input_path / "X_test.csv")
-    y_test = pd.read_csv(input_path / "y_test.csv")
+    model = joblib.load(model_artifact.path)
+    X_test = pd.read_csv(test_path.path / "X_test.csv")
+    y_test = pd.read_csv(test_path.path / "y_test.csv")
 
 
     y_pred = model.predict(X_test)
     metrics = RegressionMetrics.evaluate(y_test, y_pred)
     print(f"✅ Model evaluated successfully.")
 
-    metrics_path = evaluation_path / "metrics.json"
-    print(f"✅ Metrics saved to {metrics_path}")
-
+    metrics_path = evaluation_path.path / "metrics.json"
     with open(metrics_path, "w") as f:
         json.dump(metrics, f, indent=4)
+    print(f"✅ Metrics saved to {evaluation_path.path}")
 
     coef_df = pd.DataFrame({
         "feature": X_test.columns,

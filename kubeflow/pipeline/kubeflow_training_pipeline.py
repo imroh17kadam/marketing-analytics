@@ -5,7 +5,7 @@ from kubeflow.components.train_component import train_model
 from kubeflow.components.evaluate_component import evaluate_model
 
 
-# @pipeline(name="mmm-training-pipeline")
+@pipeline(name="mmm-training-pipeline")
 def training_pipeline():
     query = """
         SELECT *
@@ -14,24 +14,19 @@ def training_pipeline():
 
     ingest_op = ingest_training_data(
         query=query, 
-        output_path="artifacts/ingestion/ingested_data.csv"
     )
 
     feature_op = build_features(
-        input_path="artifacts/ingestion/ingested_data.csv",
-        output_path="artifacts/features/feature_engineered_data.csv"
+        input_path=ingest_op.outputs['output_path']
     )
 
     train_op = train_model(
-        input_path="artifacts/features/feature_engineered_data.csv",
-        model_artifact="artifacts/model/ridge_mmm_v1.pkl",
-        test_path="artifacts/test/"
+        input_path=feature_op.outputs['output_path'],
     )
 
     evaluate_model(
-        input_path="artifacts/test/",
-        model_artifact="artifacts/model/ridge_mmm_v1.pkl",
-        evaluation_path="artifacts/evaluation/"
+        test_path=train_op.outputs['test_path'],
+        model_artifact=train_op.outputs['model_artifact'],
     )
 
 
