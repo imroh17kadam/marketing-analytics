@@ -113,19 +113,19 @@ marketing-analytics/
 │ └── sample/
 |
 ├── kubeflow/
-| └── components/
-│   ├── load_data/
-│   │   ├── component.py
-│   │   └── Dockerfile
-│   ├── train_mmm/
-│   │   ├── component.py
-│   │   └── Dockerfile
-│   ├── evaluate_model/
-│   │   ├── component.py
-│   │   └── Dockerfile
-│   └── save_artifacts/
-│       ├── component.py
-│       └── Dockerfile
+| ├── components/
+│ │ ├── __init__.py
+│ │ ├── load_component.py
+│ │ ├── train_component.py
+│ │ ├── evaluate_component.py
+│ │ └── featured_component.py
+│ │
+│ ├── pipeline/
+│ │ ├── __init__.py
+│ │ └── mmm_training_pipeline.py
+│ │
+| ├── __init__.py
+│ └── compilet.py
 │
 ├── kubeflow_pipelines/
 │ └── mmm_training_pipeline.py
