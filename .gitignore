@@ -221,7 +221,10 @@ __pycache__/
 .venv/
 
 # Kubeflow files
-*.yaml
+kubeflow/*.yaml
 
 # MLFlow
 mlflow.db
+
+# Logs
+logs/

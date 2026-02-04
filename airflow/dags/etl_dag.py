@@ -5,13 +5,13 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 
-from src.ingestion.extract import extract_data
-from src.preprocess.transform import transform_data
+from src.dags.extract import extract_data
+from src.dags.transform import transform_data
 
-from src.ingestion.extract import extract_data
-from src.preprocess.load_raw_to_snowflake import load_raw_to_snowflake
-from src.preprocess.transform import transform_data
-from src.preprocess.load import load_data
+from src.dags.extract import extract_data
+from src.dags.load_raw_to_snowflake import load_raw_to_snowflake
+from src.dags.transform import transform_data
+from src.dags.load import load_data
 
 default_args = {
     'owner': 'data_engineering',
