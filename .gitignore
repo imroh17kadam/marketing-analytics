@@ -222,3 +222,6 @@ __pycache__/
 
 # Kubeflow files
 *.yaml
+
+# MLFlow
+mlflow.db
