@@ -2,37 +2,49 @@ from kfp.dsl import component, Input, Output, Dataset, Model
 from pathlib import Path
 import json
 
-@component(base_image="python:3.10")
+@component(
+    base_image="python:3.10",
+    packages_to_install=["pandas", "joblib", "mlflow"]
+)
 def evaluate_model(
     test_path: Input[Dataset],
     model_artifact: Input[Model],
     evaluation_path: Output[Dataset]
 ):
-    """
-    Store MMM coefficients into Snowflake.
-    """
     import pandas as pd
     import joblib
     import uuid
+    import mlflow
     from datetime import datetime
     from src.common.snowflake_client import SnowflakeClient
     from src.evaluation.metrics import RegressionMetrics
 
+    # Connect to same MLflow server
+    mlflow.set_tracking_uri("http://localhost:5000")
 
+    # Load model & test data
     model = joblib.load(model_artifact.path)
     X_test = pd.read_csv(test_path.path / "X_test.csv")
     y_test = pd.read_csv(test_path.path / "y_test.csv")
 
-
     y_pred = model.predict(X_test)
     metrics = RegressionMetrics.evaluate(y_test, y_pred)
+
     print(f"✅ Model evaluated successfully.")
 
+    # Save metrics locally
     metrics_path = evaluation_path.path / "metrics.json"
     with open(metrics_path, "w") as f:
         json.dump(metrics, f, indent=4)
-    print(f"✅ Metrics saved to {evaluation_path.path}")
 
+    # Log metrics to MLflow
+    with mlflow.start_run(run_name="kubeflow_ridge_evaluation"):
+        for k, v in metrics.items():
+            mlflow.log_metric(k, float(v))
+
+        print("✅ Metrics logged to MLflow")
+
+    # Store coefficients in Snowflake (same as before)
     coef_df = pd.DataFrame({
         "feature": X_test.columns,
         "coefficient": model.coef_
@@ -61,11 +73,11 @@ def evaluate_model(
             row["feature"],
             float(row["coefficient"]),
             row["run_id"],
-            row["created_at"].isoformat()  # 🔑 FIX
+            row["created_at"].isoformat()
         )
         sf.execute(query, params)
 
     sf.close()
 
     print(f"✅ Coefficients saved to Snowflake")
-    print(f"✅ Pipelines successfully completed.")
+    print(f"✅ Evaluation completed.")
