@@ -1,0 +1,15 @@
+environment: prod
+
+paths:
+  data_raw: "/mnt/prod/data/raw"
+  data_processed: "/mnt/prod/data/processed"
+  artifacts: "s3://marketing-ml-artifacts"
+
+mlflow:
+  tracking_uri: "https://mlflow.yourcompany.com"
+
+snowflake:
+  role: ML_SERVICE_ROLE_PROD
+  warehouse: ML_WH_PROD
+  database: MARKETING_ML_PROD
+  schema: ANALYTICS

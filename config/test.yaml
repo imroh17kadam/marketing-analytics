@@ -1,0 +1,15 @@
+environment: test
+
+paths:
+  data_raw: "data/sample"
+  data_processed: "data/processed_test"
+  artifacts: "artifacts_test"
+
+mlflow:
+  tracking_uri: "http://localhost:5001"
+
+snowflake:
+  role: ML_SERVICE_ROLE_TEST
+  warehouse: ML_WH_TEST
+  database: MARKETING_ML_TEST
+  schema: ANALYTICS_TEST
