@@ -20,7 +20,7 @@ def evaluate_model(
     from src.evaluation.metrics import RegressionMetrics
 
     # Connect to same MLflow server
-    mlflow.set_tracking_uri("http://localhost:5000")
+    mlflow.set_tracking_uri("http://localhost:5001")
 
     # Load model & test data
     model = joblib.load(model_artifact.path)

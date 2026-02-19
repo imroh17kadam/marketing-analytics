@@ -1,0 +1,37 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+
+# Git
+.git/
+.gitignore
+
+# Logs
+logs/
+*.log
+
+# Airflow (if not needed inside training image)
+airflow/
+
+# Notebooks
+notebooks/
+
+# Data files
+data/
+*.csv
+
+# Local configs
+.env
+.env.*
+
+# Docker files not needed inside image
+docker/Dockerfile.inference
+
+# OS files
+.DS_Store
