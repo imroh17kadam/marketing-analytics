@@ -98,12 +98,15 @@ marketing-analytics/
 | ├── Dockerfile
 | ├── requirements.txt
 │ └── plugins/
+│   ├── __init__.py
+│   └── datadog_monitoring.py
 │
 ├── artifacts/
 │ └── ridge_model_mmm.pkl
 │
 ├── config/
 │ ├── dev.yaml
+│ ├── test.yaml
 │ ├── prod.yaml
 │ └── snowflake_config.yaml
 │
@@ -111,26 +114,27 @@ marketing-analytics/
 │ ├── raw/
 │ ├── processed/
 │ └── sample/
+│
+├── docker/
+│ ├── Dockerfile.inference
+│ └── Dockerfile.training
 |
 ├── kubeflow/
-| └── components/
-│   ├── load_data/
-│   │   ├── component.py
-│   │   └── Dockerfile
-│   ├── train_mmm/
-│   │   ├── component.py
-│   │   └── Dockerfile
-│   ├── evaluate_model/
-│   │   ├── component.py
-│   │   └── Dockerfile
-│   └── save_artifacts/
-│       ├── component.py
-│       └── Dockerfile
+| ├── components/
+│ │ ├── __init__.py
+│ │ ├── load_component.py
+│ │ ├── train_component.py
+│ │ ├── evaluate_component.py
+│ │ └── featured_component.py
+│ │
+│ ├── pipeline/
+│ │ ├── __init__.py
+│ │ └── mmm_training_pipeline.py
+│ │
+| ├── __init__.py
+│ └── compile_pipeline.py
 │
-├── kubeflow_pipelines/
-│ └── mmm_training_pipeline.py
-│
-└── requirements.txt
+├── mlruns/
 │
 ├── notebooks/
 │ └── test.ipynb
@@ -142,7 +146,15 @@ marketing-analytics/
 │
 ├── src/
 │ ├── common/
+│ │ ├── constants.py
+│ │ ├── generator.py
 │ │ └── snowflake_client.py
+│ │
+│ ├── dags/
+│ │ ├── extract.py
+│ │ ├── load_raw_to_snowflake.py
+│ │ ├── load.py
+│ │ └── transform.py
 │ │
 │ ├── evaluation/
 │ │ ├── roi.py
@@ -154,9 +166,7 @@ marketing-analytics/
 │ │ └── saturation.py
 | |
 │ ├── ingestion/
-│ │ ├── generator.py
-│ │ ├── ingestion.py
-│ │ └── extract.py
+│ │ └── ingestion.py
 │ │
 │ ├── models/
 │ │ ├── baseline_model.py
@@ -164,25 +174,26 @@ marketing-analytics/
 │ │ └── mmm_model.py
 │ │
 │ ├── preprocess/
-│ │ ├── load_raw_to_snowflake.py
-│ │ ├── load.py
-| | ├── preprocess.py
-│ │ └── transform.py
+│ │ └── preprocess.py
 │ │
 │ ├── simulation/
 │ │ ├── optimizer.py
 │ │ └── scenarios.py
 │ │
 │ └── utils/
-│  ├── logger.py
-│  └── config_loader.py
+│   ├── monitoring.py
+│   └── logger.py
 │
 ├── venv/
+├── .dockerignore
 ├── .env
 ├── airflow-webserver.pid
 ├── airflow.cfg
+├── config_loader.py
+├── docker-compose.datadog.yaml
 ├── LICENSE
 ├── main.py
+├── mlflow.db
 ├── test_snowflake_connection.py
 └── webserver_config.py 
 ```
