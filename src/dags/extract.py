@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 # Import config loader from ROOT (not src)
 from config_loader import ConfigLoader
-from utils.logger import get_logger  # cleaner absolute import
+from src.utils.logger import get_logger  # cleaner absolute import
 
 # Load environment variables (.env)
 load_dotenv()
@@ -35,7 +35,7 @@ class DataExtractor:
             self.file_path = Path(file_path)
         else:
             raw_dir = self.config.get("paths")["data_raw"]
-            self.file_path = Path(raw_dir) / "marketing_data.csv"
+            self.file_path = Path(raw_dir) / "synthetic_mmm_data.csv"
 
     def validate_path(self) -> None:
         """Validate that file exists before reading."""

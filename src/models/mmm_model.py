@@ -6,6 +6,11 @@ from sklearn.model_selection import train_test_split
 from src.utils.logger import get_logger
 from src.evaluation.metrics import RegressionMetrics
 
+
+from src.utils.monitoring import increment, gauge, timing
+import time
+
+
 class RegularizedMMM:
     """
     Regularized Marketing Mix Model using Ridge Regression
@@ -79,24 +84,44 @@ class RegularizedMMM:
         return X_train, X_test, y_train, y_test
 
     def fit(self, X: pd.DataFrame, y: pd.Series):
-        """
-        Train Ridge Regression
-        """
-        self.logger.info(f"Starting RegularizedMMM training (alpha={self.alpha})")
 
-        # Validate inputs
-        self._validate_features(X)
-        self._validate_target(y)
+        start = time.time()
 
-        # Split data
-        self.X_train, self.X_test, self.y_train, self.y_test = self.split_data(X, y)
+        increment("marketing.training.started")
 
-        # Train model
-        self.model.fit(self.X_train, self.y_train)
+        try:
 
-        self.logger.info("Ridge Regression model trained successfully")
+            self.logger.info(f"Starting RegularizedMMM training (alpha={self.alpha})")
 
-        # Store coefficients (sorted by importance)
+            # Validate inputs
+            self._validate_features(X)
+            self._validate_target(y)
+
+            # Split data
+            self.X_train, self.X_test, self.y_train, self.y_test = self.split_data(X, y)
+
+            # Train model
+            self.model.fit(self.X_train, self.y_train)
+
+            increment("marketing.training.completed")
+
+            self.logger.info("Ridge Regression model trained successfully")
+
+        except Exception as e:
+
+            increment("marketing.training.failed")
+
+            self.logger.error(f"Training failed: {str(e)}")
+
+            raise e
+
+        finally:
+
+            duration = time.time() - start
+
+            timing("marketing.training.duration", duration)
+
+        # Store coefficients
         self.coef_df = (
             pd.DataFrame({
                 "feature": self.X_train.columns,
@@ -108,6 +133,7 @@ class RegularizedMMM:
         )
 
         self.logger.info("Model coefficients stored")
+
         return self
 
     def predict(self, X: pd.DataFrame) -> pd.Series:
