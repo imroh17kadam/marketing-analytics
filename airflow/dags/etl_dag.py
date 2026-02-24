@@ -91,9 +91,9 @@ def transform_and_load_processed():
 # -------------------------
 
 with DAG(
-    dag_id="marketing_sales_etl_v2",
+    dag_id="marketing_sales_etl_v1",
     start_date=datetime(2025, 1, 1),
-    schedule_interval="@daily",
+    schedule="@daily",
     catchup=False,
     default_args=default_args,
     tags=["etl", "marketing", "snowflake"],
