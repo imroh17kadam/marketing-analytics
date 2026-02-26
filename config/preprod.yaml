@@ -1,0 +1,15 @@
+environment: preprod
+
+paths:
+  data_raw: "data/raw"
+  data_processed: "data/processed"
+  artifacts: "artifacts"
+
+mlflow:
+  tracking_uri: "http://15.207.150.133:5000/"
+
+snowflake:
+  role: ML_SERVICE_ROLE
+  warehouse: ML_WH
+  database: MARKETING_ML
+  schema: ANALYTICS

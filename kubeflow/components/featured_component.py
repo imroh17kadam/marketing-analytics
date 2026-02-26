@@ -1,41 +1,28 @@
-from kfp.dsl import component, Output, Dataset
-import pandas as pd
-
+from kfp.dsl import component, Input, Output, Dataset
 from pathlib import Path
-import sys
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-sys.path.append(str(PROJECT_ROOT))
-
-from src.features.feature_builder import MediaFeatureBuilder
-from src.common.constants import channel_params
 
 
-# @component(
-#     base_image="ml-base:latest"
-# )
+@component(
+    base_image="python:3.10",
+    packages_to_install=["pandas"]
+)
 def build_features(
-    input_data,
-    output_data,
+    input_path: Input[Dataset],
+    output_path: Output[Dataset]
 ):
-    df = pd.read_csv(input_data)
-    df = df.dropna()
+    """
+    Build MMM features using adstock and saturation.
+    """
+    import pandas as pd
+    from src.features.feature_builder import MediaFeatureBuilder
+    from src.common.constants import channel_params
+
+    df = pd.read_csv(input_path.path).dropna()
 
     builder = MediaFeatureBuilder(channel_params)
-    df_mmm = builder.transform(df)
 
-    output_path = Path(output_data)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    print(df_mmm)
-
-    df_mmm.to_csv(output_path, index=False)
-
-
-
-if __name__ == "__main__":
-    input_data = PROJECT_ROOT / "artifacts" / "processed_data" / "processed_sales_data.csv"
-    output_data = PROJECT_ROOT / "artifacts" / "featured_data" / "feature_engineered_sales_data.csv"
+    df_mmm: pd.DataFrame = builder.transform(df)
     
+    df_mmm.to_csv(output_path.path, index=False)
 
-    build_features(input_data=str(input_data), output_data=output_data)
+    print(f"✅ Data saved to {output_path.path}")

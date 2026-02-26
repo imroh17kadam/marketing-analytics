@@ -5,13 +5,14 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 
-from src.ingestion.extract import extract_data
-from src.preprocess.transform import transform_data
+from src.dags.extract import DataExtractor
+from src.dags.load_raw_to_snowflake import load_raw_to_snowflake
+from src.dags.transform import transform_data
+from src.dags.load import load_data
 
-from src.ingestion.extract import extract_data
-from src.preprocess.load_raw_to_snowflake import load_raw_to_snowflake
-from src.preprocess.transform import transform_data
-from src.preprocess.load import load_data
+# Datadog monitoring
+from plugins.datadog_monitoring import track_task
+
 
 default_args = {
     'owner': 'data_engineering',
@@ -21,16 +22,73 @@ default_args = {
 
 RAW_PATH = "data/raw/synthetic_mmm_data.csv"
 
+
+# -------------------------
+# TASK 1 — Extract + Load Raw
+# -------------------------
+
 def extract_and_load_raw():
-    df_raw = extract_data(RAW_PATH)
-    load_raw_to_snowflake(df_raw, source="synthetic_csv")
+
+    monitor = track_task("marketing.airflow.extract_load_raw")
+
+    monitor.start()
+
+    try:
+
+        df_raw = DataExtractor.extract()
+
+        load_raw_to_snowflake(
+            df_raw,
+            source="synthetic_csv"
+        )
+
+        monitor.success()
+
+    except Exception as e:
+
+        monitor.fail()
+
+        raise e
+
+    finally:
+
+        monitor.duration()
+
+
+# -------------------------
+# TASK 2 — Transform + Load Processed
+# -------------------------
 
 def transform_and_load_processed():
-    # For now transform uses the extracted dataframe logic
-    # In STEP 6 we will read directly from Snowflake
-    df_raw = extract_data(RAW_PATH)
-    df_processed = transform_data(df_raw)
-    load_data(df_processed)
+
+    monitor = track_task("marketing.airflow.transform_load_processed")
+
+    monitor.start()
+
+    try:
+
+        df_raw = DataExtractor.extract()
+
+        df_processed = transform_data(df_raw)
+
+        load_data(df_processed)
+
+        monitor.success()
+
+    except Exception as e:
+
+        monitor.fail()
+
+        raise e
+
+    finally:
+
+        monitor.duration()
+
+
+# -------------------------
+# DAG Definition
+# -------------------------
 
 with DAG(
     dag_id="marketing_sales_etl_v2",

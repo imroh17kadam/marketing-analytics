@@ -86,24 +86,31 @@ Business Insights (MMM / Meridian)
 ```
 marketing-analytics/
 │
-├── README.md
-├── requirements.txt
-├── .gitignore
-│
 ├── airflow/
 │ ├── dags/
 │ │ └── etl_pipeline.py
+│ ├── dag_tasks/
+│ │ ├── extract.py
+│ │ ├── load_raw_to_snowflake.py
+│ │ ├── load.py
+│ │ └── transform.py
+│ ├── deployment/
+│ │ ├── cluster.yaml
+│ │ ├── custom-values.yaml
+│ │ └── values-kind.yaml
 | ├── logs/
-| ├── docker-compose.yaml
+│ ├── plugins/
+│ │ ├── __init__.py
+│ │ └── datadog_monitoring.py
 | ├── Dockerfile
-| ├── requirements.txt
-│ └── plugins/
+| └── requirements.txt
 │
 ├── artifacts/
 │ └── ridge_model_mmm.pkl
 │
 ├── config/
 │ ├── dev.yaml
+│ ├── preprod.yaml
 │ ├── prod.yaml
 │ └── snowflake_config.yaml
 │
@@ -111,26 +118,28 @@ marketing-analytics/
 │ ├── raw/
 │ ├── processed/
 │ └── sample/
+│
+├── docker/
+│ ├── Dockerfile.inference
+│ └── Dockerfile.training
 |
 ├── kubeflow/
-| └── components/
-│   ├── load_data/
-│   │   ├── component.py
-│   │   └── Dockerfile
-│   ├── train_mmm/
-│   │   ├── component.py
-│   │   └── Dockerfile
-│   ├── evaluate_model/
-│   │   ├── component.py
-│   │   └── Dockerfile
-│   └── save_artifacts/
-│       ├── component.py
-│       └── Dockerfile
-│
-├── kubeflow_pipelines/
-│ └── mmm_training_pipeline.py
-│
-└── requirements.txt
+| ├── components/
+│ │ ├── __init__.py
+│ │ ├── load_component.py
+│ │ ├── train_component.py
+│ │ ├── evaluate_component.py
+│ │ └── featured_component.py
+│ │
+│ ├── pipeline/
+│ │ ├── __init__.py
+│ │ └── mmm_training_pipeline.py
+│ │
+| ├── __init__.py
+│ └── compile_pipeline.py
+││
+├── monitoring/
+│ └── docker-compose.datadog.yaml
 │
 ├── notebooks/
 │ └── test.ipynb
@@ -142,6 +151,8 @@ marketing-analytics/
 │
 ├── src/
 │ ├── common/
+│ │ ├── constants.py
+│ │ ├── generator.py
 │ │ └── snowflake_client.py
 │ │
 │ ├── evaluation/
@@ -154,9 +165,7 @@ marketing-analytics/
 │ │ └── saturation.py
 | |
 │ ├── ingestion/
-│ │ ├── generator.py
-│ │ ├── ingestion.py
-│ │ └── extract.py
+│ │ └── ingestion.py
 │ │
 │ ├── models/
 │ │ ├── baseline_model.py
@@ -164,27 +173,25 @@ marketing-analytics/
 │ │ └── mmm_model.py
 │ │
 │ ├── preprocess/
-│ │ ├── load_raw_to_snowflake.py
-│ │ ├── load.py
-| | ├── preprocess.py
-│ │ └── transform.py
+│ │ └── preprocess.py
 │ │
 │ ├── simulation/
 │ │ ├── optimizer.py
 │ │ └── scenarios.py
 │ │
 │ └── utils/
-│  ├── logger.py
-│  └── config_loader.py
+│   ├── monitoring.py
+│   └── logger.py
 │
 ├── venv/
+├── .dockerignore
 ├── .env
-├── airflow-webserver.pid
-├── airflow.cfg
+├── .gitignore
+├── config_loader.py
 ├── LICENSE
 ├── main.py
-├── test_snowflake_connection.py
-└── webserver_config.py 
+├── README.md
+└── requirements.txt
 ```
 
 ---
