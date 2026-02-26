@@ -25,7 +25,7 @@ COPY config_loader.py ./config_loader.py
 COPY main.py ./main.py
 
 # Optional default environment (can override later)
-ENV ENV=dev
+ENV ENV=preprod
 
 # Ensure src imports work
 ENV PYTHONPATH="${PYTHONPATH}:/marketing_analytics"

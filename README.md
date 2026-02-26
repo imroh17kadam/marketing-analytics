@@ -86,27 +86,31 @@ Business Insights (MMM / Meridian)
 ```
 marketing-analytics/
 │
-├── README.md
-├── requirements.txt
-├── .gitignore
-│
 ├── airflow/
 │ ├── dags/
 │ │ └── etl_pipeline.py
+│ ├── dag_tasks/
+│ │ ├── extract.py
+│ │ ├── load_raw_to_snowflake.py
+│ │ ├── load.py
+│ │ └── transform.py
+│ ├── deployment/
+│ │ ├── cluster.yaml
+│ │ ├── custom-values.yaml
+│ │ └── values-kind.yaml
 | ├── logs/
-| ├── docker-compose.yaml
+│ ├── plugins/
+│ │ ├── __init__.py
+│ │ └── datadog_monitoring.py
 | ├── Dockerfile
-| ├── requirements.txt
-│ └── plugins/
-│   ├── __init__.py
-│   └── datadog_monitoring.py
+| └── requirements.txt
 │
 ├── artifacts/
 │ └── ridge_model_mmm.pkl
 │
 ├── config/
 │ ├── dev.yaml
-│ ├── test.yaml
+│ ├── preprod.yaml
 │ ├── prod.yaml
 │ └── snowflake_config.yaml
 │
@@ -133,8 +137,9 @@ marketing-analytics/
 │ │
 | ├── __init__.py
 │ └── compile_pipeline.py
-│
-├── mlruns/
+││
+├── monitoring/
+│ └── docker-compose.datadog.yaml
 │
 ├── notebooks/
 │ └── test.ipynb
@@ -149,12 +154,6 @@ marketing-analytics/
 │ │ ├── constants.py
 │ │ ├── generator.py
 │ │ └── snowflake_client.py
-│ │
-│ ├── dags/
-│ │ ├── extract.py
-│ │ ├── load_raw_to_snowflake.py
-│ │ ├── load.py
-│ │ └── transform.py
 │ │
 │ ├── evaluation/
 │ │ ├── roi.py
@@ -187,15 +186,12 @@ marketing-analytics/
 ├── venv/
 ├── .dockerignore
 ├── .env
-├── airflow-webserver.pid
-├── airflow.cfg
+├── .gitignore
 ├── config_loader.py
-├── docker-compose.datadog.yaml
 ├── LICENSE
 ├── main.py
-├── mlflow.db
-├── test_snowflake_connection.py
-└── webserver_config.py 
+├── README.md
+└── requirements.txt
 ```
 
 ---
