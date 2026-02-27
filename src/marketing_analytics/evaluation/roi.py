@@ -1,10 +1,8 @@
 import pandas as pd
-import numpy as np
-
-from src.features.adstock import AdstockTransformer
-from src.features.saturation import SaturationTransformer
-
 from utils.logger import get_logger
+
+from src.marketing_analytics.features.adstock import AdstockTransformer
+from src.marketing_analytics.features.saturation import SaturationTransformer
 
 
 class ROIAnalyzer:
@@ -55,9 +53,7 @@ class ROIAnalyzer:
             alpha = params.get("alpha", 1.0)
 
             # Adstock
-            adstocked = AdstockTransformer.geometric(
-                df[channel].values, decay=decay
-            )
+            adstocked = AdstockTransformer.geometric(df[channel].values, decay=decay)
 
             # Saturation
             df[f"{channel}_adstock"] = SaturationTransformer.hill(
@@ -93,12 +89,9 @@ class ROIAnalyzer:
 
         self.logger.info(f"Computing incremental sales for channels: {channel_cols}")
 
-        contrib_df = (
-            pd.DataFrame.from_dict(
-                contributions, orient="index", columns=["incremental_sales"]
-            )
-            .sort_values(by="incremental_sales", ascending=False)
-        )
+        contrib_df = pd.DataFrame.from_dict(
+            contributions, orient="index", columns=["incremental_sales"]
+        ).sort_values(by="incremental_sales", ascending=False)
 
         return contrib_df
 
@@ -113,9 +106,7 @@ class ROIAnalyzer:
         # Attach spend to corresponding channels
         contrib_df["total_spend"] = total_spend.loc[contrib_df.index]
 
-        contrib_df["ROI"] = (
-            contrib_df["incremental_sales"] / contrib_df["total_spend"]
-        )
+        contrib_df["ROI"] = contrib_df["incremental_sales"] / contrib_df["total_spend"]
 
         return contrib_df
 
@@ -156,8 +147,7 @@ class ROIAnalyzer:
         """
 
         results = {
-            channel: self.simulate_roi(channel, increase_pct)
-            for channel in channels
+            channel: self.simulate_roi(channel, increase_pct) for channel in channels
         }
 
         return pd.DataFrame.from_dict(

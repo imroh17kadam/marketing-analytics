@@ -2,10 +2,10 @@ from typing import Dict, List
 
 import pandas as pd
 
-# Project-relative imports (no hardcoded "src.")
-from src.features.adstock import AdstockTransformer
-from src.features.saturation import SaturationTransformer
-from src.utils.logger import get_logger
+# Project-relative imports (no hardcoded "src.marketing_analytics.")
+from src.marketing_analytics.features.adstock import AdstockTransformer
+from src.marketing_analytics.features.saturation import SaturationTransformer
+from src.marketing_analytics.utils.logger import get_logger
 
 
 class ScenarioSimulator:
@@ -42,9 +42,7 @@ class ScenarioSimulator:
         self._validate_inputs()
 
         # Compute baseline sales once
-        self.baseline_sales = float(
-            self.model.predict(self.df[self.features]).sum()
-        )
+        self.baseline_sales = float(self.model.predict(self.df[self.features]).sum())
 
         self.logger.info(
             f"ScenarioSimulator initialized | baseline_sales={self.baseline_sales:.2f}"
@@ -100,7 +98,7 @@ class ScenarioSimulator:
                 raise TypeError(f"pct_change must be numeric for channel {channel}")
 
             # Apply spend change
-            df_sim[channel] *= (1 + pct_change)
+            df_sim[channel] *= 1 + pct_change
 
             # Recompute adstock + saturation
             params = self.channel_params[channel]
@@ -113,9 +111,7 @@ class ScenarioSimulator:
                 f"Recomputing transforms | channel={channel} | decay={decay} | gamma={gamma}"
             )
 
-            adstocked = AdstockTransformer.geometric(
-                df_sim[channel], decay=decay
-            )
+            adstocked = AdstockTransformer.geometric(df_sim[channel], decay=decay)
 
             df_sim[f"{channel}_adstock"] = SaturationTransformer.hill(
                 adstocked, alpha=alpha, gamma=gamma
@@ -137,9 +133,7 @@ class ScenarioSimulator:
         simulated_sales = self.simulate_budget_change(channel_changes)
         lift = simulated_sales - self.baseline_sales
 
-        self.logger.info(
-            f"Scenario lift computed | lift={lift:.2f}"
-        )
+        self.logger.info(f"Scenario lift computed | lift={lift:.2f}")
 
         return float(lift)
 
@@ -150,7 +144,7 @@ class ScenarioSimulator:
         Parameters
         ----------
         scenarios : dict
-            Keys = scenario name  
+            Keys = scenario name
             Values = channel_changes dict
 
         Returns

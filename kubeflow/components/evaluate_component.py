@@ -1,23 +1,23 @@
-from kfp.dsl import component, Input, Output, Dataset, Model
-from pathlib import Path
 import json
 
-@component(
-    base_image="python:3.10",
-    packages_to_install=["pandas", "joblib", "mlflow"]
-)
+from kfp.dsl import Dataset, Input, Model, Output, component
+
+
+@component(base_image="python:3.10", packages_to_install=["pandas", "joblib", "mlflow"])
 def evaluate_model(
     test_path: Input[Dataset],
     model_artifact: Input[Model],
-    evaluation_path: Output[Dataset]
+    evaluation_path: Output[Dataset],
 ):
-    import pandas as pd
-    import joblib
     import uuid
-    import mlflow
     from datetime import datetime
-    from src.common.snowflake_client import SnowflakeClient
-    from src.evaluation.metrics import RegressionMetrics
+
+    import joblib
+    import mlflow
+    import pandas as pd
+
+    from src.marketing_analytics.common.snowflake_client import SnowflakeClient
+    from src.marketing_analytics.evaluation.metrics import RegressionMetrics
 
     # Connect to same MLflow server
     mlflow.set_tracking_uri("http://localhost:5001")
@@ -30,7 +30,7 @@ def evaluate_model(
     y_pred = model.predict(X_test)
     metrics = RegressionMetrics.evaluate(y_test, y_pred)
 
-    print(f"✅ Model evaluated successfully.")
+    print("✅ Model evaluated successfully.")
 
     # Save metrics locally
     metrics_path = evaluation_path.path / "metrics.json"
@@ -45,10 +45,9 @@ def evaluate_model(
         print("✅ Metrics logged to MLflow")
 
     # Store coefficients in Snowflake (same as before)
-    coef_df = pd.DataFrame({
-        "feature": X_test.columns,
-        "coefficient": model.coef_
-    }).sort_values(by="coefficient", ascending=False)
+    coef_df = pd.DataFrame(
+        {"feature": X_test.columns, "coefficient": model.coef_}
+    ).sort_values(by="coefficient", ascending=False)
 
     sf = SnowflakeClient()
 
@@ -73,11 +72,11 @@ def evaluate_model(
             row["feature"],
             float(row["coefficient"]),
             row["run_id"],
-            row["created_at"].isoformat()
+            row["created_at"].isoformat(),
         )
         sf.execute(query, params)
 
     sf.close()
 
-    print(f"✅ Coefficients saved to Snowflake")
-    print(f"✅ Evaluation completed.")
+    print("✅ Coefficients saved to Snowflake")
+    print("✅ Evaluation completed.")

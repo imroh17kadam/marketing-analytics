@@ -1,11 +1,9 @@
 import joblib
 import pandas as pd
-import numpy as np
-
 from sklearn.linear_model import LinearRegression
 
-from src.features.feature_builder import MediaFeatureBuilder
-from src.utils.logger import get_logger
+from src.marketing_analytics.features.feature_builder import MediaFeatureBuilder
+from src.marketing_analytics.utils.logger import get_logger
 
 
 class ForecastPipeline:
@@ -22,7 +20,7 @@ class ForecastPipeline:
         channel_params: dict,
         baseline_features: list,
         features_mmm: list,
-        model_path: str = "artifacts/ridge_mmm_model.pkl"
+        model_path: str = "artifacts/ridge_mmm_model.pkl",
     ):
         self.channel_params = channel_params
         self.baseline_features = baseline_features
@@ -64,18 +62,11 @@ class ForecastPipeline:
         self.logger.info("Training baseline demand model")
 
         model = LinearRegression()
-        model.fit(
-            historical_df[self.baseline_features],
-            historical_df["sales"]
-        )
+        model.fit(historical_df[self.baseline_features], historical_df["sales"])
 
         return model
 
-    def run(
-        self,
-        historical_df: pd.DataFrame,
-        future_df: pd.DataFrame
-    ) -> pd.DataFrame:
+    def run(self, historical_df: pd.DataFrame, future_df: pd.DataFrame) -> pd.DataFrame:
 
         self.logger.info("Forecast pipeline started")
 
@@ -99,13 +90,9 @@ class ForecastPipeline:
         # ---- Forecast ----
         self.logger.info("Generating forecasts")
 
-        future_base = baseline_model.predict(
-            future_df[self.baseline_features]
-        )
+        future_base = baseline_model.predict(future_df[self.baseline_features])
 
-        future_uplift = mmm_model.predict(
-            future_transformed[self.features_mmm]
-        )
+        future_uplift = mmm_model.predict(future_transformed[self.features_mmm])
 
         future_df["forecast_sales"] = future_base + future_uplift
 

@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 
 class RegressionMetrics:
@@ -24,5 +24,5 @@ class RegressionMetrics:
         return {
             "RMSE": RegressionMetrics.rmse(y_true, y_pred),
             "MAE": RegressionMetrics.mae(y_true, y_pred),
-            "R2": RegressionMetrics.r2(y_true, y_pred)
+            "R2": RegressionMetrics.r2(y_true, y_pred),
         }

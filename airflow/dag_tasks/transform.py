@@ -1,5 +1,6 @@
 import pandas as pd
-from src.utils.logger import get_logger
+
+from src.marketing_analytics.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -9,7 +10,7 @@ NUMERIC_COLS = [
     "digital_spend",
     "search_spend",
     "social_spend",
-    "price_index"
+    "price_index",
 ]
 
 FLAG_COLS = ["promo_flag", "holiday_flag"]

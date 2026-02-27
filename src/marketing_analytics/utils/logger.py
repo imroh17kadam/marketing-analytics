@@ -1,7 +1,8 @@
 import logging
-import sys
 import os
+import sys
 from logging.handlers import RotatingFileHandler
+
 
 # ---------- COLOR DEFINITIONS ----------
 class LogColors:
@@ -25,19 +26,15 @@ class ColorFormatter(logging.Formatter):
         logging.DEBUG: LogColors.BLUE
         + "%(asctime)s - %(name)s - DEBUG - %(message)s"
         + LogColors.RESET,
-
         logging.INFO: LogColors.WHITE
         + "%(asctime)s - %(name)s - INFO - %(message)s"
         + LogColors.RESET,
-
         logging.WARNING: LogColors.YELLOW
         + "%(asctime)s - %(name)s - WARNING - %(message)s"
         + LogColors.RESET,
-
         logging.ERROR: LogColors.RED
         + "%(asctime)s - %(name)s - ERROR - %(message)s"
         + LogColors.RESET,
-
         logging.CRITICAL: LogColors.MAGENTA
         + LogColors.BOLD
         + "%(asctime)s - %(name)s - CRITICAL - %(message)s"
@@ -81,9 +78,9 @@ def get_logger(name: str, level=logging.INFO) -> logging.Logger:
         # ---------- FILE HANDLER (ROTATING) ----------
         file_handler = RotatingFileHandler(
             filename=log_file_path,
-            maxBytes=5 * 1024 * 1024,   # 5 MB per file
-            backupCount=5,              # Keep last 5 log files
-            encoding="utf-8"
+            maxBytes=5 * 1024 * 1024,  # 5 MB per file
+            backupCount=5,  # Keep last 5 log files
+            encoding="utf-8",
         )
 
         file_formatter = logging.Formatter(

@@ -1,10 +1,10 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
-from src.utils.logger import get_logger
-from src.evaluation.metrics import RegressionMetrics
+from src.marketing_analytics.evaluation.metrics import RegressionMetrics
+from src.marketing_analytics.utils.logger import get_logger
 
 
 class BaselineMMM:
@@ -34,13 +34,14 @@ class BaselineMMM:
 
         if not all(pd.api.types.is_numeric_dtype(X[col]) for col in X.columns):
             non_numeric = [
-                col for col in X.columns
-                if not pd.api.types.is_numeric_dtype(X[col])
+                col for col in X.columns if not pd.api.types.is_numeric_dtype(X[col])
             ]
             raise TypeError(f"Non-numeric columns found in X: {non_numeric}")
 
         if X.isnull().any().any():
-            raise ValueError("X contains NaN values. Please preprocess before training.")
+            raise ValueError(
+                "X contains NaN values. Please preprocess before training."
+            )
 
     def _validate_target(self, y: pd.Series) -> None:
         if y is None or len(y) == 0:
@@ -61,10 +62,7 @@ class BaselineMMM:
         )
 
         X_train, X_test, y_train, y_test = train_test_split(
-            X,
-            y,
-            test_size=self.test_size,
-            shuffle=False
+            X, y, test_size=self.test_size, shuffle=False
         )
 
         self.logger.info(
@@ -94,11 +92,13 @@ class BaselineMMM:
 
         # Store coefficients (with ranking + absolute importance)
         self.coef_df = (
-            pd.DataFrame({
-                "feature": X.columns,
-                "coefficient": self.model.coef_,
-                "abs_coefficient": np.abs(self.model.coef_),
-            })
+            pd.DataFrame(
+                {
+                    "feature": X.columns,
+                    "coefficient": self.model.coef_,
+                    "abs_coefficient": np.abs(self.model.coef_),
+                }
+            )
             .sort_values(by="abs_coefficient", ascending=False)
             .reset_index(drop=True)
         )
@@ -117,11 +117,7 @@ class BaselineMMM:
 
         self.logger.info(f"Generating predictions for data with shape {X.shape}")
 
-        return pd.Series(
-            self.model.predict(X),
-            index=X.index,
-            name="predicted_sales"
-        )
+        return pd.Series(self.model.predict(X), index=X.index, name="predicted_sales")
 
     def evaluate(self, X: pd.DataFrame = None, y: pd.Series = None):
         """

@@ -225,6 +225,7 @@ kubeflow/*.yaml
 
 # MLFlow
 mlflow.db
+mlruns/
 
 # Logs
 logs/

@@ -1,10 +1,10 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
 import pandas as pd
 
-from src.utils.logger import get_logger
-from src.features.adstock import AdstockTransformer
-from src.features.saturation import SaturationTransformer
+from src.marketing_analytics.features.adstock import AdstockTransformer
+from src.marketing_analytics.features.saturation import SaturationTransformer
+from src.marketing_analytics.utils.logger import get_logger
 
 
 class MediaFeatureBuilder:
@@ -62,13 +62,9 @@ class MediaFeatureBuilder:
             )
 
             # --- Your original logic preserved, just using new classes ---
-            adstocked = AdstockTransformer.geometric(
-                df_out[channel], decay=decay
-            )
+            adstocked = AdstockTransformer.geometric(df_out[channel], decay=decay)
 
-            saturated = SaturationTransformer.hill(
-                adstocked, alpha=alpha, gamma=gamma
-            )
+            saturated = SaturationTransformer.hill(adstocked, alpha=alpha, gamma=gamma)
 
             df_out[f"{channel}_adstock"] = saturated
 

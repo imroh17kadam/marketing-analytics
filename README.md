@@ -137,7 +137,7 @@ marketing-analytics/
 │ │
 | ├── __init__.py
 │ └── compile_pipeline.py
-││
+│
 ├── monitoring/
 │ └── docker-compose.datadog.yaml
 │
@@ -150,38 +150,41 @@ marketing-analytics/
 │ └── train_pipeline.py
 │
 ├── src/
-│ ├── common/
-│ │ ├── constants.py
-│ │ ├── generator.py
-│ │ └── snowflake_client.py
+│ ├── marketing_analytics
+│ │ ├── common/
+│ │ │ ├── constants.py
+│ │ │ ├── generator.py
+│ │ │ └── snowflake_client.py
+│ │ │
+│ │ ├── evaluation/
+│ │ │ ├── roi.py
+│ │ │ └── metrics.py
+│ │ │
+│ │ ├── features/
+│ │ │ ├── adstock.py
+│ │ │ ├── feature_builder.py
+│ │ │ └── saturation.py
+│ | |
+│ │ ├── ingestion/
+│ │ │ └── ingestion.py
+│ │ │
+│ │ ├── models/
+│ │ │ ├── baseline_model.py
+│ │ │ ├── forecasting.py
+│ │ │ └── mmm_model.py
+│ │ │
+│ │ ├── preprocess/
+│ │ │ └── preprocess.py
+│ │ │
+│ │ ├── simulation/
+│ │ │ ├── optimizer.py
+│ │ │ └── scenarios.py
+│ │ │
+│ │ └── utils/
+│ │   ├── monitoring.py
+│ │   └── logger.py
 │ │
-│ ├── evaluation/
-│ │ ├── roi.py
-│ │ └── metrics.py
-│ │
-│ ├── features/
-│ │ ├── adstock.py
-│ │ ├── feature_builder.py
-│ │ └── saturation.py
-| |
-│ ├── ingestion/
-│ │ └── ingestion.py
-│ │
-│ ├── models/
-│ │ ├── baseline_model.py
-│ │ ├── forecasting.py
-│ │ └── mmm_model.py
-│ │
-│ ├── preprocess/
-│ │ └── preprocess.py
-│ │
-│ ├── simulation/
-│ │ ├── optimizer.py
-│ │ └── scenarios.py
-│ │
-│ └── utils/
-│   ├── monitoring.py
-│   └── logger.py
+│ └── __init__.py
 │
 ├── venv/
 ├── .dockerignore
@@ -190,8 +193,8 @@ marketing-analytics/
 ├── config_loader.py
 ├── LICENSE
 ├── main.py
-├── README.md
-└── requirements.txt
+├── pyproject.toml
+└── README.md
 ```
 
 ---

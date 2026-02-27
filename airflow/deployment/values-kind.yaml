@@ -31,7 +31,7 @@ dags:
   gitSync:
     enabled: true
     repo: https://github.com/imroh17kadam/marketing-analytics.git
-    branch: local
+    branch: dev
     subPath: .
     wait: 30
 

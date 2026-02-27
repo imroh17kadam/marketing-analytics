@@ -1,10 +1,9 @@
-from typing import List, Optional
+from typing import List
 
 import numpy as np
 import pandas as pd
 
-from src.utils.logger import get_logger
-
+from src.marketing_analytics.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -18,12 +17,11 @@ class Preprocessor:
     - Encode binary flag columns
     - Apply safe log transformations
     """
-    logger = get_logger(__qualname__) 
+
+    logger = get_logger(__qualname__)
 
     @staticmethod
-    def fill_missing(
-        df: pd.DataFrame, strategy: str = "mean"
-    ) -> pd.DataFrame:
+    def fill_missing(df: pd.DataFrame, strategy: str = "mean") -> pd.DataFrame:
         """
         Fill missing values using specified strategy.
 
@@ -62,9 +60,7 @@ class Preprocessor:
         return df_filled
 
     @staticmethod
-    def encode_flags(
-        df: pd.DataFrame, flag_columns: List[str]
-    ) -> pd.DataFrame:
+    def encode_flags(df: pd.DataFrame, flag_columns: List[str]) -> pd.DataFrame:
         """
         Ensure promo/holiday flags are 0/1 integers.
 
@@ -86,19 +82,13 @@ class Preprocessor:
                 raise KeyError(f"Flag column not found in dataframe: {col}")
 
             # Ensure safe conversion
-            df_encoded[col] = (
-                df_encoded[col]
-                .fillna(0)
-                .astype(int)
-            )
+            df_encoded[col] = df_encoded[col].fillna(0).astype(int)
 
         Preprocessor.logger.info("Flag encoding completed")
         return df_encoded
 
     @staticmethod
-    def log_transform(
-        df: pd.DataFrame, cols: List[str]
-    ) -> pd.DataFrame:
+    def log_transform(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
         """
         Apply log(1 + x) transformation to specified numeric columns.
 
@@ -120,9 +110,7 @@ class Preprocessor:
                 raise KeyError(f"Column not found for log transform: {col}")
 
             if not np.issubdtype(df_log[col].dtype, np.number):
-                raise TypeError(
-                    f"Column must be numeric for log transform: {col}"
-                )
+                raise TypeError(f"Column must be numeric for log transform: {col}")
 
             # Avoid negative values issue
             if (df_log[col] < 0).any():

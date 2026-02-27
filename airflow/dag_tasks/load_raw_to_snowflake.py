@@ -1,10 +1,12 @@
-import pandas as pd
-from src.utils.logger import get_logger
-
 from datetime import datetime
-from src.common.snowflake_client import SnowflakeClient
+
+import pandas as pd
+
+from src.marketing_analytics.common.snowflake_client import SnowflakeClient
+from src.marketing_analytics.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
 
 def load_raw_to_snowflake(df: pd.DataFrame, source: str):
     """
@@ -18,8 +20,8 @@ def load_raw_to_snowflake(df: pd.DataFrame, source: str):
     """
     sf_df = df.copy()
 
-    sf_df['ingestion_timestamp'] = datetime.utcnow()
-    sf_df['source'] = source
+    sf_df["ingestion_timestamp"] = datetime.utcnow()
+    sf_df["source"] = source
 
     # Connect to Snowflake
     sf = SnowflakeClient()

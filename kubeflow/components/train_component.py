@@ -1,13 +1,9 @@
-from kfp.dsl import component, Input, Output, Dataset, Model
+from kfp.dsl import Dataset, Input, Model, Output, component
+
 
 @component(
     base_image="python:3.10",
-    packages_to_install=[
-        "pandas",
-        "scikit-learn",
-        "joblib",
-        "mlflow"
-    ]
+    packages_to_install=["pandas", "scikit-learn", "joblib", "mlflow"],
 )
 def train_model(
     input_path: Input[Dataset],
@@ -15,14 +11,15 @@ def train_model(
     test_path: Output[Dataset],
     target: str = "sales",
     alpha: float = 1.0,
-    test_size: float = 0.2
+    test_size: float = 0.2,
 ):
-    import pandas as pd
     import joblib
     import mlflow
+    import pandas as pd
     from sklearn.linear_model import Ridge
     from sklearn.model_selection import train_test_split
-    from src.common.constants import features_mmm
+
+    from src.marketing_analytics.common.constants import features_mmm
 
     # Set MLflow tracking server
     mlflow.set_tracking_uri("http://localhost:5000")
@@ -51,7 +48,7 @@ def train_model(
         model = Ridge(alpha=alpha)
         model.fit(X_train, y_train)
 
-        print(f"✅ Model fitting completed.")
+        print("✅ Model fitting completed.")
 
         # Save locally for Kubeflow artifact
         joblib.dump(model, model_artifact.path)
@@ -60,11 +57,11 @@ def train_model(
         mlflow.sklearn.log_model(
             sk_model=model,
             artifact_path="ridge_model",
-            registered_model_name="MMM-Ridge-Model"
+            registered_model_name="MMM-Ridge-Model",
         )
 
         # Save test data
         X_test.to_csv(test_path.path / "X_test.csv", index=False)
         y_test.to_csv(test_path.path / "y_test.csv", index=False)
 
-        print(f"✅ Model logged & registered in MLflow")
+        print("✅ Model logged & registered in MLflow")

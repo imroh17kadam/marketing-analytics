@@ -3,7 +3,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 
-from src.utils.logger import get_logger
+from src.marketing_analytics.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -15,14 +15,13 @@ class AdstockTransformer:
     Currently supports:
     - Geometric adstock (default)
     """
-    logger = get_logger(__qualname__) 
+
+    logger = get_logger(__qualname__)
 
     @staticmethod
     def validate_decay(decay: float) -> None:
         if not (0 < decay < 1):
-            raise ValueError(
-                f"Decay must be between 0 and 1 (exclusive). Got: {decay}"
-            )
+            raise ValueError(f"Decay must be between 0 and 1 (exclusive). Got: {decay}")
 
     @staticmethod
     def validate_series(series: Union[np.ndarray, pd.Series]) -> np.ndarray:
@@ -38,7 +37,9 @@ class AdstockTransformer:
             )
 
         if np.isnan(series).any():
-            AdstockTransformer.logger.warning("Input series contains NaN values — replacing with 0")
+            AdstockTransformer.logger.warning(
+                "Input series contains NaN values — replacing with 0"
+            )
             series = np.nan_to_num(series, nan=0.0)
 
         if (series < 0).any():

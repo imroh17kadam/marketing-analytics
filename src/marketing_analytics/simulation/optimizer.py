@@ -4,7 +4,8 @@ import pandas as pd
 
 # Use project-level imports (not hardcoded paths)
 from simulation.scenarios import ScenarioSimulator
-from src.utils.logger import get_logger
+
+from src.marketing_analytics.utils.logger import get_logger
 
 
 class BudgetOptimizer:
