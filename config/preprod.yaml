@@ -1,4 +1,4 @@
-environment: test
+environment: preprod
 
 paths:
   data_raw: "data/sample"
