@@ -11,7 +11,7 @@ from src.dags.transform import transform_data
 from src.dags.load import load_data
 
 # Datadog monitoring
-from plugins.datadog_monitoring import track_task
+# from plugins.datadog_monitoring import track_task
 
 
 default_args = {
@@ -29,9 +29,9 @@ RAW_PATH = "data/raw/synthetic_mmm_data.csv"
 
 def extract_and_load_raw():
 
-    monitor = track_task("marketing.airflow.extract_load_raw")
+    # monitor = track_task("marketing.airflow.extract_load_raw")
 
-    monitor.start()
+    # monitor.start()
 
     try:
 
@@ -42,17 +42,17 @@ def extract_and_load_raw():
             source="synthetic_csv"
         )
 
-        monitor.success()
+        # monitor.success()
 
     except Exception as e:
 
-        monitor.fail()
+        # monitor.fail()
 
         raise e
 
     finally:
-
-        monitor.duration()
+        print("Succeeded")
+        # monitor.duration()
 
 
 # -------------------------
@@ -61,9 +61,9 @@ def extract_and_load_raw():
 
 def transform_and_load_processed():
 
-    monitor = track_task("marketing.airflow.transform_load_processed")
+    # monitor = track_task("marketing.airflow.transform_load_processed")
 
-    monitor.start()
+    # monitor.start()
 
     try:
 
@@ -73,17 +73,17 @@ def transform_and_load_processed():
 
         load_data(df_processed)
 
-        monitor.success()
+        # monitor.success()
 
     except Exception as e:
 
-        monitor.fail()
+        # monitor.fail()
 
         raise e
 
     finally:
-
-        monitor.duration()
+        print("Succeeded")
+        # monitor.duration()
 
 
 # -------------------------
@@ -91,9 +91,9 @@ def transform_and_load_processed():
 # -------------------------
 
 with DAG(
-    dag_id="marketing_sales_etl_v2",
+    dag_id="marketing_sales_etl_v1",
     start_date=datetime(2025, 1, 1),
-    schedule_interval="@daily",
+    schedule="@daily",
     catchup=False,
     default_args=default_args,
     tags=["etl", "marketing", "snowflake"],
