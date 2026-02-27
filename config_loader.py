@@ -7,12 +7,12 @@ from typing import Literal, Any
 class ConfigLoader:
     """
     Central configuration loader for the entire project.
-    Picks configuration based on ENV variable (dev/test/prod).
+    Picks configuration based on ENV variable (dev/preprod/prod).
     """
 
-    VALID_ENVS = ("dev", "test", "prod")
+    VALID_ENVS = ("dev", "preprod", "prod")
 
-    def __init__(self, env: Literal["dev", "test", "prod"] | None = None):
+    def __init__(self, env: Literal["dev", "preprod", "prod"] | None = None):
         # Determine environment
         self.env = env or os.getenv("ENV", "dev")
 
