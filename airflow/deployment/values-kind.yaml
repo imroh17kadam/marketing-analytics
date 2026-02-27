@@ -32,5 +32,9 @@ dags:
     enabled: true
     repo: https://github.com/imroh17kadam/marketing-analytics.git
     branch: local
-    subPath: airflow/dags
+    subPath: .
     wait: 30
+
+extraEnv: |
+  - name: PYTHONPATH
+    value: /opt/airflow/dags/repo
