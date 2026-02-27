@@ -1,12 +1,12 @@
 # src/models/forecasting.py
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import LinearRegression
 
-from src.features.adstock import AdstockTransformer
-from src.features.saturation import SaturationTransformer
-from src.utils.logger import get_logger
+from src.marketing_analytics.features.adstock import AdstockTransformer
+from src.marketing_analytics.features.saturation import SaturationTransformer
+from src.marketing_analytics.utils.logger import get_logger
 
 
 class DemandForecaster:
@@ -56,9 +56,7 @@ class DemandForecaster:
             raise KeyError(f"Missing required columns: {missing}")
 
     def _validate_numeric(self, df: pd.DataFrame, cols: list) -> None:
-        non_numeric = [
-            c for c in cols if not pd.api.types.is_numeric_dtype(df[c])
-        ]
+        non_numeric = [c for c in cols if not pd.api.types.is_numeric_dtype(df[c])]
         if non_numeric:
             raise TypeError(f"Non-numeric columns found: {non_numeric}")
 
@@ -130,9 +128,9 @@ class DemandForecaster:
         df = df.copy()
         df["date"] = pd.to_datetime(
             df["date"],
-            dayfirst=True,      # <-- IMPORTANT FIX
-            format="mixed",     # <-- Allows mixed formats safely
-            errors="raise"
+            dayfirst=True,  # <-- IMPORTANT FIX
+            format="mixed",  # <-- Allows mixed formats safely
+            errors="raise",
         )
 
         last_date = df["date"].max()
@@ -143,13 +141,15 @@ class DemandForecaster:
             freq="W",
         )
 
-        future_df = pd.DataFrame({
-            "date": future_dates,
-            "weekofyear": future_dates.isocalendar().week.astype(int),
-            "price_index": 1.0,
-            "promo_flag": 0,
-            "holiday_flag": 0,
-        })
+        future_df = pd.DataFrame(
+            {
+                "date": future_dates,
+                "weekofyear": future_dates.isocalendar().week.astype(int),
+                "price_index": 1.0,
+                "promo_flag": 0,
+                "holiday_flag": 0,
+            }
+        )
 
         # Add optimized spend per channel
         for channel, value in optimized_spend.items():
@@ -160,10 +160,12 @@ class DemandForecaster:
             if channel not in df.columns:
                 raise KeyError(f"Channel '{channel}' not found in historical data.")
 
-            combined_series = np.concatenate([
-                df[channel].values,
-                future_df[channel].values,
-            ])
+            combined_series = np.concatenate(
+                [
+                    df[channel].values,
+                    future_df[channel].values,
+                ]
+            )
 
             adstocked = AdstockTransformer.geometric(
                 combined_series,

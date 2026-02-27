@@ -1,7 +1,8 @@
 import os
-import yaml
-import snowflake.connector
 from pathlib import Path
+
+import snowflake.connector
+import yaml
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,7 +13,7 @@ def resolve(value):
     if isinstance(value, str) and value.startswith("${") and value.endswith("}"):
         return os.getenv(value[2:-1])
     return value
-    
+
 
 class SnowflakeClient:
     def __init__(self, config_path="config/snowflake_config.yaml"):

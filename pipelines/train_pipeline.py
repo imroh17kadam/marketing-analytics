@@ -1,28 +1,26 @@
-from pathlib import Path
-from datetime import datetime
-from typing import Tuple, Dict, List
 import uuid
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Tuple
 
-import pandas as pd
 import joblib
-
-from sklearn.model_selection import train_test_split
-
 import mlflow
 import mlflow.sklearn
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+from config_loader import ConfigLoader
+from src.marketing_analytics.common.snowflake_client import SnowflakeClient
+from src.marketing_analytics.evaluation.metrics import RegressionMetrics
+from src.marketing_analytics.features.feature_builder import MediaFeatureBuilder
 
 # Project-relative imports
-from src.ingestion.ingestion import DataIngestion
-from src.features.feature_builder import MediaFeatureBuilder
-from src.preprocess.preprocess import Preprocessor   
-from src.evaluation.metrics import RegressionMetrics
-from src.utils.logger import get_logger
-from src.common.snowflake_client import SnowflakeClient
-from config_loader import ConfigLoader
+from src.marketing_analytics.ingestion.ingestion import DataIngestion
 
 # REUSING YOUR EXISTING MODEL COMPONENTS
-from src.models.baseline_model import BaselineMMM
-from src.models.mmm_model import RegularizedMMM
+from src.marketing_analytics.models.mmm_model import RegularizedMMM
+from src.marketing_analytics.preprocess.preprocess import Preprocessor
+from src.marketing_analytics.utils.logger import get_logger
 
 
 class TrainPipeline:
@@ -43,7 +41,7 @@ class TrainPipeline:
         test_size: float = 0.2,
         experiment_name: str = "marketing-mmm",
         flag_columns: List[str] = None,
-        log_transform_cols: List[str] = None
+        log_transform_cols: List[str] = None,
     ):
         self.query = query
         self.channel_params = channel_params
@@ -81,7 +79,9 @@ class TrainPipeline:
 
             if experiment is None:
                 # Experiment does not exist → create new
-                self.logger.info(f"Experiment '{self.experiment_name}' not found. Creating new one.")
+                self.logger.info(
+                    f"Experiment '{self.experiment_name}' not found. Creating new one."
+                )
                 mlflow.create_experiment(self.experiment_name)
 
             elif experiment.lifecycle_stage == "deleted":
@@ -89,7 +89,9 @@ class TrainPipeline:
                 self.logger.warning(
                     f"Experiment '{self.experiment_name}' was deleted. Restoring it."
                 )
-                mlflow.tracking.MlflowClient().restore_experiment(experiment.experiment_id)
+                mlflow.tracking.MlflowClient().restore_experiment(
+                    experiment.experiment_id
+                )
 
             # Now safely set experiment
             mlflow.set_experiment(self.experiment_name)
@@ -155,7 +157,9 @@ class TrainPipeline:
         Instead of re-writing Ridge training here
         """
 
-        self.logger.info("Training MMM Model using src.models.mmm_model")
+        self.logger.info(
+            "Training MMM Model using src.marketing_analytics.models.mmm_model"
+        )
 
         mmm_model = RegularizedMMM(alpha=self.alpha)
         model = mmm_model.fit(X_train, y_train)
@@ -169,9 +173,7 @@ class TrainPipeline:
         self.logger.info(f"Saved model locally at: {model_path}")
         return model_path
 
-    def _save_coefficients(
-        self, X: pd.DataFrame, model, run_id: str
-    ) -> Path:
+    def _save_coefficients(self, X: pd.DataFrame, model, run_id: str) -> Path:
         """
         Save coefficients properly when using RegularizedMMM
         """
@@ -181,15 +183,15 @@ class TrainPipeline:
             coef_df = model.get_coefficients()[["feature", "coefficient"]]
         else:
             # Fallback (if you ever switch back to sklearn model)
-            coef_df = pd.DataFrame({
-                "feature": X.columns,
-                "coefficient": model.coef_,
-            })
+            coef_df = pd.DataFrame(
+                {
+                    "feature": X.columns,
+                    "coefficient": model.coef_,
+                }
+            )
 
-        coef_df = (
-            coef_df
-            .sort_values(by="coefficient", ascending=False)
-            .reset_index(drop=True)
+        coef_df = coef_df.sort_values(by="coefficient", ascending=False).reset_index(
+            drop=True
         )
 
         coef_df["model_name"] = "ridge_mmm_v1"

@@ -1,9 +1,9 @@
 import joblib
 import pandas as pd
 
-from src.features.feature_builder import MediaFeatureBuilder
-from src.simulation.scenarios import ScenarioSimulator
-from src.utils.logger import get_logger
+from src.marketing_analytics.features.feature_builder import MediaFeatureBuilder
+from src.marketing_analytics.simulation.scenarios import ScenarioSimulator
+from src.marketing_analytics.utils.logger import get_logger
 
 
 class SimulationPipeline:
@@ -20,7 +20,7 @@ class SimulationPipeline:
         df: pd.DataFrame,
         channel_params: dict,
         features_mmm: list,
-        model_path: str = "artifacts/ridge_mmm_model.pkl"
+        model_path: str = "artifacts/ridge_mmm_model.pkl",
     ):
         self.df = df
         self.channel_params = channel_params
@@ -82,10 +82,7 @@ class SimulationPipeline:
 
             lift = simulator.scenario_lift(changes)
 
-            results.append({
-                "scenario": scenario_name,
-                "sales_lift": lift
-            })
+            results.append({"scenario": scenario_name, "sales_lift": lift})
 
         # ---- Create ranked output ----
         result_df = (

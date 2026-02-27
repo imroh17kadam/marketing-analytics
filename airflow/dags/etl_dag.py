@@ -1,23 +1,25 @@
 import sys
-sys.path.append("/opt/airflow")
 
-from airflow import DAG
-from airflow.operators.python import PythonOperator
+sys.path.insert("/opt/airflow")
+
 from datetime import datetime, timedelta
 
+from airflow.operators.python import PythonOperator
+
+from airflow import DAG
 from airflow.dag_tasks.extract import DataExtractor
+from airflow.dag_tasks.load import load_data
 from airflow.dag_tasks.load_raw_to_snowflake import load_raw_to_snowflake
 from airflow.dag_tasks.transform import transform_data
-from airflow.dag_tasks.load import load_data
 
 # Datadog monitoring
 # from plugins.datadog_monitoring import track_task
 
 
 default_args = {
-    'owner': 'data_engineering',
-    'retries': 2,
-    'retry_delay': timedelta(minutes=5),
+    "owner": "data_engineering",
+    "retries": 2,
+    "retry_delay": timedelta(minutes=5),
 }
 
 RAW_PATH = "data/raw/synthetic_mmm_data.csv"
@@ -26,6 +28,7 @@ RAW_PATH = "data/raw/synthetic_mmm_data.csv"
 # -------------------------
 # TASK 1 — Extract + Load Raw
 # -------------------------
+
 
 def extract_and_load_raw():
 
@@ -37,10 +40,7 @@ def extract_and_load_raw():
 
         df_raw = DataExtractor.extract()
 
-        load_raw_to_snowflake(
-            df_raw,
-            source="synthetic_csv"
-        )
+        load_raw_to_snowflake(df_raw, source="synthetic_csv")
 
         # monitor.success()
 
@@ -58,6 +58,7 @@ def extract_and_load_raw():
 # -------------------------
 # TASK 2 — Transform + Load Processed
 # -------------------------
+
 
 def transform_and_load_processed():
 

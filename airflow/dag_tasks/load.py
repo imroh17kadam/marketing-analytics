@@ -1,12 +1,13 @@
-import os
-from src.utils.logger import get_logger
+import uuid
+from datetime import datetime
 
 import pandas as pd
-from datetime import datetime
-import uuid
-from src.common.snowflake_client import SnowflakeClient
+
+from src.marketing_analytics.common.snowflake_client import SnowflakeClient
+from src.marketing_analytics.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
 
 def load_data(df: pd.DataFrame) -> None:
     """
@@ -18,8 +19,8 @@ def load_data(df: pd.DataFrame) -> None:
     """
     # Add metadata
     df = df.copy()
-    df['processing_timestamp'] = datetime.utcnow()
-    df['run_id'] = str(uuid.uuid4())  # Unique ID for this run
+    df["processing_timestamp"] = datetime.utcnow()
+    df["run_id"] = str(uuid.uuid4())  # Unique ID for this run
 
     # Connect to Snowflake
     sf = SnowflakeClient()

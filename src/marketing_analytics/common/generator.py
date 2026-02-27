@@ -1,12 +1,11 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
 
 def generate_marketing_data(
-    start_date="2021-01-03",
-    n_weeks=156,
-    seed=42
+    start_date="2021-01-03", n_weeks=156, seed=42
 ) -> pd.DataFrame:
     """
     Generate synthetic weekly marketing mix data
@@ -16,7 +15,6 @@ def generate_marketing_data(
     dates = pd.date_range(start=start_date, periods=n_weeks, freq="W")
     # weekofyear = dates.weekofyear
     weekofyear = dates.isocalendar().week
-
 
     # Seasonality
     seasonal_effect = 1 + 0.15 * np.sin(2 * np.pi * weekofyear / 52)
@@ -48,18 +46,20 @@ def generate_marketing_data(
         + np.random.normal(0, 1500, n_weeks)
     )
 
-    df = pd.DataFrame({
-        "date": dates,
-        "weekofyear": weekofyear,
-        "tv_spend": tv_spend,
-        "digital_spend": digital_spend,
-        "search_spend": search_spend,
-        "social_spend": social_spend,
-        "promo_flag": promo_flag,
-        "holiday_flag": holiday_flag,
-        "price_index": price_index,
-        "sales": sales
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "weekofyear": weekofyear,
+            "tv_spend": tv_spend,
+            "digital_spend": digital_spend,
+            "search_spend": search_spend,
+            "social_spend": social_spend,
+            "promo_flag": promo_flag,
+            "holiday_flag": holiday_flag,
+            "price_index": price_index,
+            "sales": sales,
+        }
+    )
 
     return df
 

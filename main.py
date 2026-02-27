@@ -1,12 +1,10 @@
-from pathlib import Path
 
-from pipelines.train_pipeline import TrainPipeline
-from pipelines.simulate_pipeline import SimulationPipeline
 from pipelines.forecast_pipeline import ForecastPipeline
-
-from src.ingestion.ingestion import DataIngestion
-from src.models.forecasting import DemandForecaster
-from src.utils.logger import get_logger
+from pipelines.simulate_pipeline import SimulationPipeline
+from pipelines.train_pipeline import TrainPipeline
+from src.marketing_analytics.ingestion.ingestion import DataIngestion
+from src.marketing_analytics.models.forecasting import DemandForecaster
+from src.marketing_analytics.utils.logger import get_logger
 
 logger = get_logger("MAIN")
 
@@ -47,10 +45,7 @@ def load_data():
     (Avoid duplicate ingestion logic)
     """
     logger.info("Loading data from Snowflake")
-    return DataIngestion(
-        source="file",
-        query=QUERY
-    ).load()
+    return DataIngestion(source="file", query=QUERY).load()
 
 
 def run_training():
@@ -101,8 +96,7 @@ def run_forecast(df: "pd.DataFrame"):
     )
 
     demand_forecaster = DemandForecaster(
-        baseline_features=BASELINE_FEATURES,
-        channel_params=CHANNEL_PARAMS
+        baseline_features=BASELINE_FEATURES, channel_params=CHANNEL_PARAMS
     )
 
     # Prepare optimized future spend scenario
@@ -110,13 +104,11 @@ def run_forecast(df: "pd.DataFrame"):
         "social_spend": df["social_spend"].mean() * 1.3,
         "search_spend": df["search_spend"].mean() * 1.2,
         "tv_spend": df["tv_spend"].mean() * 0.8,
-        "digital_spend": df["digital_spend"].mean() * 0.7
+        "digital_spend": df["digital_spend"].mean() * 0.7,
     }
 
     future_df = demand_forecaster.prepare_future_data(
-        df,
-        future_weeks=12,
-        optimized_spend=optimized_spend
+        df, future_weeks=12, optimized_spend=optimized_spend
     )
 
     forecast = forecaster.run(df, future_df)

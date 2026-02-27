@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import Optional
 
@@ -7,7 +6,7 @@ from dotenv import load_dotenv
 
 # Import config loader from ROOT (not src)
 from config_loader import ConfigLoader
-from src.utils.logger import get_logger  # cleaner absolute import
+from src.marketing_analytics.utils.logger import get_logger  # cleaner absolute import
 
 # Load environment variables (.env)
 load_dotenv()

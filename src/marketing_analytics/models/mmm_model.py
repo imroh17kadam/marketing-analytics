@@ -1,14 +1,13 @@
-import pandas as pd
+import time
+
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import train_test_split
 
-from src.utils.logger import get_logger
-from src.evaluation.metrics import RegressionMetrics
-
-
-from src.utils.monitoring import increment, gauge, timing
-import time
+from src.marketing_analytics.evaluation.metrics import RegressionMetrics
+from src.marketing_analytics.utils.logger import get_logger
+from src.marketing_analytics.utils.monitoring import increment, timing
 
 
 class RegularizedMMM:
@@ -41,14 +40,15 @@ class RegularizedMMM:
             raise ValueError("Feature matrix X cannot be empty.")
 
         non_numeric = [
-            col for col in X.columns
-            if not pd.api.types.is_numeric_dtype(X[col])
+            col for col in X.columns if not pd.api.types.is_numeric_dtype(X[col])
         ]
         if non_numeric:
             raise TypeError(f"Non-numeric columns found in X: {non_numeric}")
 
         if X.isnull().any().any():
-            raise ValueError("X contains NaN values. Please preprocess before training.")
+            raise ValueError(
+                "X contains NaN values. Please preprocess before training."
+            )
 
     def _validate_target(self, y: pd.Series) -> None:
         if y is None or len(y) == 0:
@@ -123,11 +123,13 @@ class RegularizedMMM:
 
         # Store coefficients
         self.coef_df = (
-            pd.DataFrame({
-                "feature": self.X_train.columns,
-                "coefficient": self.model.coef_,
-                "abs_coefficient": np.abs(self.model.coef_),
-            })
+            pd.DataFrame(
+                {
+                    "feature": self.X_train.columns,
+                    "coefficient": self.model.coef_,
+                    "abs_coefficient": np.abs(self.model.coef_),
+                }
+            )
             .sort_values(by="abs_coefficient", ascending=False)
             .reset_index(drop=True)
         )
@@ -201,14 +203,11 @@ class RegularizedMMM:
             coef = self.model.coef_[self.X_train.columns.get_loc(col)]
             contributions[col] = coef * self.X_train[col].sum()
 
-        contrib_df = (
-            pd.DataFrame.from_dict(
-                contributions,
-                orient="index",
-                columns=["total_contribution"],
-            )
-            .sort_values(by="total_contribution", ascending=False)
-        )
+        contrib_df = pd.DataFrame.from_dict(
+            contributions,
+            orient="index",
+            columns=["total_contribution"],
+        ).sort_values(by="total_contribution", ascending=False)
 
         self.logger.info("Channel contributions computed successfully")
         return contrib_df

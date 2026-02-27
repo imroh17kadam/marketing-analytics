@@ -1,15 +1,13 @@
-import os
 from pathlib import Path
 from typing import Optional
 
 import pandas as pd
 from dotenv import load_dotenv
 
-# Project-root imports (not src.*)
+# Project-root imports (not src.marketing_analytics.*)
 from config_loader import ConfigLoader
-from src.utils.logger import get_logger
-from src.common.snowflake_client import SnowflakeClient
-
+from src.marketing_analytics.common.snowflake_client import SnowflakeClient
+from src.marketing_analytics.utils.logger import get_logger
 
 # Load environment variables (ENV=dev/prod/preprod)
 load_dotenv()
@@ -69,7 +67,9 @@ class DataIngestion:
             return self._load_from_snowflake()
 
         else:
-            raise ValueError(f"Unsupported source: {self.source}. Use 'file' or 'snowflake'.")
+            raise ValueError(
+                f"Unsupported source: {self.source}. Use 'file' or 'snowflake'."
+            )
 
     def _load_from_file(self) -> pd.DataFrame:
         # If no file path provided, take from config

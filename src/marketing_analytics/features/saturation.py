@@ -3,7 +3,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 
-from src.utils.logger import get_logger
+from src.marketing_analytics.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -15,8 +15,8 @@ class SaturationTransformer:
     Currently supports:
     - Hill saturation
     """
-    logger = get_logger(__qualname__) 
 
+    logger = get_logger(__qualname__)
 
     @staticmethod
     def validate_params(alpha: float, gamma: float) -> None:
@@ -87,9 +87,7 @@ class SaturationTransformer:
         series = cls.validate_series(series)
 
         # Hill saturation formula (your original logic preserved)
-        saturated = alpha * (series ** gamma) / (
-            (series ** gamma) + 1.0
-        )
+        saturated = alpha * (series**gamma) / ((series**gamma) + 1.0)
 
         SaturationTransformer.logger.info("Hill saturation transformation completed")
         return saturated
