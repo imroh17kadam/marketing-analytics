@@ -11,7 +11,7 @@ from src.utils.logger import get_logger
 from src.common.snowflake_client import SnowflakeClient
 
 
-# Load environment variables (ENV=dev/prod/test)
+# Load environment variables (ENV=dev/prod/preprod)
 load_dotenv()
 
 

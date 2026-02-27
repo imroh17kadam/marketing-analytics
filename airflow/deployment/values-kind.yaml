@@ -1,0 +1,36 @@
+executor: KubernetesExecutor
+
+airflow:
+  image:
+    repository: apache/airflow
+    tag: latest
+
+postgresql:
+  enabled: true
+
+redis:
+  enabled: false
+
+dags:
+  persistence:
+    enabled: false
+
+logs:
+  persistence:
+    enabled: false
+
+triggerer:
+  persistence:
+    enabled: false
+
+webserver:
+  service:
+    type: ClusterIP
+
+dags:
+  gitSync:
+    enabled: true
+    repo: https://github.com/imroh17kadam/marketing-analytics.git
+    branch: local
+    subPath: airflow/dags
+    wait: 30
