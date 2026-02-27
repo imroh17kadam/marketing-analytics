@@ -5,10 +5,10 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 
-from src.dags.extract import DataExtractor
-from src.dags.load_raw_to_snowflake import load_raw_to_snowflake
-from src.dags.transform import transform_data
-from src.dags.load import load_data
+from airflow.deployment.extract import DataExtractor
+from airflow.deployment.load_raw_to_snowflake import load_raw_to_snowflake
+from airflow.deployment.transform import transform_data
+from airflow.deployment.load import load_data
 
 # Datadog monitoring
 # from plugins.datadog_monitoring import track_task
